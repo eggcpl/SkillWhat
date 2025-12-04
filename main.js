@@ -1,5 +1,12 @@
 /* main.js — clean, final version (with retire calculation added) */
 
+/*
+  Final notes:
+  - LOAD (when input empty) restores the exact initial state (option A chosen).
+  - initialSkillsBackup stores the original skills defined at top.
+  - TOTAL SKILL (updateTotals) sums only base values (or max when maxMode active) — it does NOT include heart/morale/gear.
+*/
+
 let skills = [
   { name: "Aim", value: 92, max: 94 },
   { name: "Handling", value: 90, max: 91 },
@@ -10,6 +17,9 @@ let skills = [
   { name: "Gamesense", value: 10, max: 95 },
   { name: "Movement", value: 56, max: 94 }
 ];
+
+// backup of the initial skills to allow LOAD (empty) to fully restore initial state
+const initialSkillsBackup = JSON.parse(JSON.stringify(skills));
 
 const skillsList = document.getElementById("skills-list");
 const totalCurrent = document.getElementById("total-skill-current");
@@ -75,27 +85,22 @@ function computeSkillValues(s) {
 
 /**
  * updateTotals
- * - totalCurrent agora reflete os valores FINAIS (base + pct + gear) somados para cada skill
- * - totalMax continua a mostrar a soma dos máximos ("/800" por exemplo)
+ * - totalCurrent shows the sum of base values (or max values when maxMode)
+ * - intentionally does NOT include heart/morale/gear (per requirement)
+ * - totalMax shows sum of all skill maximums
  */
 function updateTotals() {
     let totalCurrentValue = 0;
     let totalMaxValue = 0;
 
     skills.forEach(s => {
-        // TOTAL SKILL:
-        // - se maxMode ON → soma s.max
-        // - se maxMode OFF → soma s.value
         totalCurrentValue += maxMode ? s.max : s.value;
-
-        // TOTAL MAX:
         totalMaxValue += s.max;
     });
 
     if (totalCurrent) totalCurrent.textContent = totalCurrentValue;
     if (totalMax) totalMax.textContent = "/" + totalMaxValue;
 }
-
 
 /* ---------------- PARSER ---------------- */
 function parseCardText(txt) {
@@ -253,7 +258,7 @@ function renderSkills() {
 
     const cur = document.createElement("span");
     cur.className = "skill-current";
-    // show the base number visually (same as before) — but TOTAL uses final values
+    // show the base number visually (same as before)
     cur.textContent = maxMode ? s.max : Math.round(v.base);
     if (v.final >= 100) cur.style.color = "#ee6b0e";
 
@@ -326,12 +331,11 @@ if (loadBtn) {
     renderAllEquipmentUI();
     updateGearButtonState();
 
-    // RESET GEAR POPUP
+    // RESET POPUPS
     gearLocked = false;
     if (lockBtn) lockBtn.textContent = "🔓";
     if (gearPopup) gearPopup.classList.add("hidden");
 
-    // RESET GAME POPUP
     gameLocked = false;
     const gameLockBtn = document.getElementById("game-lock-btn");
     if (gameLockBtn) gameLockBtn.textContent = "🔓";
@@ -344,7 +348,7 @@ if (loadBtn) {
     if (gameInput) gameInput.value = "";
     if (gamesPlayedEl) gamesPlayedEl.textContent = "0";
 
-    // RESET HEART SEASONS (visual)
+    // RESET HEART SEASONS
     const small = document.querySelector(".season-small");
     const big   = document.querySelector(".season-big");
     const gold  = document.querySelector(".season-gold");
@@ -364,8 +368,34 @@ if (loadBtn) {
 
     updateGamesButtonState();
 
-    // ---- AGORA SIM: CARREGA A INFO DO LOAD (prioridade) ----
-    const data = parseCardText(document.getElementById("skill-input").value);
+
+    // CHECK IF LOAD INPUT IS EMPTY -> RESTORE INITIAL STATE (option A)
+    const loadText = document.getElementById("skill-input").value.trim();
+    if (loadText.length === 0) {
+
+        // restore name + age defaults (initial view)
+        const nameEl = document.querySelector(".player-name");
+        const ageEl = document.querySelector(".player-age");
+        if (nameEl) nameEl.textContent = "Legend";
+        if (ageEl) ageEl.textContent  = "19yo (day 5)";
+
+        // restore skills to the initial backup (deep copy)
+        skills = JSON.parse(JSON.stringify(initialSkillsBackup));
+
+        // recompute and refresh UI
+        recomputeEquipmentBoosts();
+        renderAllEquipmentUI();
+        updateGearButtonState();
+        renderSkills();
+        computeMaxCareerHeart();
+        updateGamesButtonState();
+        updateRetireDisplayIfNeeded();
+        return; // done
+    }
+
+
+    // NORMAL LOAD (text present)
+    const data = parseCardText(loadText);
 
     const nameEl = document.querySelector(".player-name");
     const ageEl = document.querySelector(".player-age");
@@ -373,8 +403,15 @@ if (loadBtn) {
     if (nameEl) nameEl.textContent = data.playerName;
     if (ageEl)  ageEl.textContent  = data.playerAge;
 
-    if (data.skills.length) skills = data.skills;
+    if (data.skills.length) {
+      // if parsed skills are present, replace skills
+      skills = data.skills;
+    }
 
+    // ensure UI and calculations updated
+    recomputeEquipmentBoosts();
+    renderAllEquipmentUI();
+    updateGearButtonState();
     updateRetireDisplayIfNeeded();
     computeMaxCareerHeart();
     renderSkills();
@@ -412,7 +449,7 @@ const EQUIPMENT = {
     { name: "AJ Pad", boosts: { Handling: 2, Quickness: 1 }, tokens: "H2 Q1" },
     { name: "Noctron", boosts: { Aim: 1, Quickness: 2 }, tokens: "A1 Q2" },
     { name: "Citus", boosts: { Aim: 1, Handling: 1, Quickness: 1 }, tokens: "A1 H1 Q1" },
-    { name: "Armageddon", boosts: { Aim: 1, Handling: 1 }, tokens: "A1 H2" }
+    { name: "Armageddon", boosts: { Aim: 1, Handling: 2 }, tokens: "A1 H2" }
   ],
   mouse: [
     { name: "Aquila Fly", boosts: { Aim: 2, Handling: 1 }, tokens: "A2 H1" },
