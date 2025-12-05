@@ -186,13 +186,13 @@ function renderSkills() {
     const v = computeSkillValues(s);
 
     const baseVal = v.base;
-    const afterPctVal = v.afterPercent;
     const finalVal = v.final;
 
+    // ------------------------------
+    // WIDTHS (apenas 2 segmentos)
+    // ------------------------------
     const baseW = Math.min(baseVal, 100);
-    const pctW = Math.max(0, Math.min(afterPctVal, 100) - baseW);
-    const gearW = Math.max(0, Math.min(finalVal, 100) - (baseW + pctW));
-    const totalW = baseW + pctW + gearW;
+    const boostW = Math.max(0, Math.min(finalVal, 100) - baseW);
 
     const row = document.createElement("div");
     row.className = "skill-row";
@@ -210,57 +210,84 @@ function renderSkills() {
     limit.style.width = s.max + "%";
     bar.appendChild(limit);
 
+    // ----------------------------------
+    // BASE (sempre laranja)
+    // ----------------------------------
     const baseF = document.createElement("div");
     baseF.className = "skill-fill";
-    baseF.style.width = baseW + "%";
     baseF.style.left = "0";
-    baseF.style.zIndex = 2;
-    baseF.style.backgroundColor = finalVal >= 100 ? "#f7f8c9" : "#ff7a00";
-    if (finalVal >= 100) baseF.style.boxShadow = "0 0 10px rgba(238,223,192,0.75)";
+    baseF.style.width = baseW + "%";
+    baseF.style.zIndex = 1;
+    baseF.style.backgroundColor = "#ff7a00"; // laranja
+    baseF.style.borderRadius = "999px 0 0 999px";
     bar.appendChild(baseF);
 
-    let pctF = null;
-    if (pctW > 0) {
-      pctF = document.createElement("div");
-      pctF.className = "skill-fill-boost";
-      pctF.style.left = baseW + "%";
-      pctF.style.width = pctW + "%";
-      pctF.style.zIndex = 3;
-      pctF.style.backgroundColor = "#f5be9e";
-      pctF.style.borderRadius = "0";
-      bar.appendChild(pctF);
-    }
+    // ----------------------------------
+    // BOOST TOTAL (HM + morale + gear)
+    // ----------------------------------
+let boostF = null;
 
-    let gearF = null;
-    if (gearW > 0) {
-      gearF = document.createElement("div");
-      gearF.className = "skill-fill-boost";
-      gearF.style.left = (baseW + pctW) + "%";
-      gearF.style.width = gearW + "%";
-      gearF.style.zIndex = 3;
-      gearF.style.backgroundColor = "#f5be9e";
-      gearF.style.borderRadius = "0";
-      bar.appendChild(gearF);
-    }
+// BOOST (HM + morale + gear) como único segmento de boost
+if (boostW > 0) {
+  boostF = document.createElement("div");
+  boostF.className = "skill-fill-boost";
+  boostF.style.left = baseW + "%";
+  boostF.style.width = boostW + "%";
+  boostF.style.zIndex = 2;
+  
 
-    baseF.style.borderRadius = "999px 0 0 999px";
-    if (pctF) pctF.style.borderRadius = "0";
-    if (gearF) gearF.style.borderRadius = "0";
+  // Se final >= 100 → dourado + brilho + canto redondo
+  if (finalVal >= 100) {
+    boostF.style.backgroundColor = "#f7e395";
+    boostF.style.borderRadius = "0 999px 999px 0";
+    boostF.style.boxShadow = "0 0 10px rgba(238,223,192,0.75)";
+  } else {
+    boostF.style.backgroundColor = "#f5be9e";
+    boostF.style.borderRadius = "0";
+  }
 
-    if (Math.abs(totalW - 100) < 1e-6 || totalW > 99.9999) {
-      if (gearF) gearF.style.borderRadius = "0 999px 999px 0";
-      else if (pctF) pctF.style.borderRadius = "0 999px 999px 0";
-      else { baseF.style.borderRadius = "999px"; baseF.style.width = "100%"; }
-    }
+  bar.appendChild(boostF);
+}
 
+// SE NÃO EXISTIR BOOST → base atinge 100 sozinha
+if (finalVal >= 100 && boostW === 0) {
+  baseF.style.backgroundColor = "#edeec0";
+  baseF.style.borderRadius = "999px";
+  baseF.style.boxShadow = "0 0 10px rgba(238,223,192,0.80)";
+}
+
+if (finalVal >= 100) {
+  baseF.style.backgroundColor = "#edeec0";
+  baseF.style.boxShadow =
+    "0 0 12px rgba(238,223,192,0.25), 0 0 28px rgba(255, 255, 255, 0.15)";
+
+  if (boostF) {
+    boostF.style.backgroundColor = "#f5be9e";
+    boostF.style.boxShadow = "none";
+  }
+
+} else {
+  baseF.style.backgroundColor = "#ff7a00";
+  baseF.style.boxShadow = "none";
+
+  if (boostF) {
+    boostF.style.backgroundColor = "#f5be9e";
+    boostF.style.boxShadow = "none";
+  }
+}
+
+
+
+    // ----------------------------------
+    // VALORES
+    // ----------------------------------
     const val = document.createElement("div");
     val.className = "skill-value";
 
     const cur = document.createElement("span");
     cur.className = "skill-current";
-    // show the base number visually (same as before)
     cur.textContent = maxMode ? s.max : Math.round(v.base);
-    if (v.final >= 100) cur.style.color = "#ee6b0e";
+    if (finalVal >= 100) cur.style.color = "#ee6b0e";
 
     const mx = document.createElement("span");
     mx.className = "skill-max";
@@ -281,6 +308,7 @@ function renderSkills() {
 
   updateTotals();
 }
+
 
 /* ---------------- TOOLTIP ---------------- */
 const tooltip = document.getElementById("skill-tooltip");
