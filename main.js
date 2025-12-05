@@ -1,3 +1,9 @@
+// Icons para MAX HEART POSSIBLE
+const ICON_SMALL_HTML = '<span class="heart-small2">❤️</span>';
+const ICON_BIG_HTML   = '❤️';
+const ICON_GOLD_HTML  = '💛';
+const ICON_PLAT_HTML  = '💙';
+
 /* main.js — clean, final version (with retire calculation added) */
 
 /*
@@ -841,23 +847,45 @@ document.addEventListener('DOMContentLoaded', () => {
       platReq = Math.floor(platReq * 0.75);
     }
 
-    function setSeason(span, req, seasonCode) {
-      if (games >= req) { span.textContent = "✔"; span.style.color = "#76ff76"; }
-      else { span.textContent = seasonCode; span.style.color = ""; }
+    // ---- calcular season de reforma ----
+    let retireSeason = null;
+    const ageEl = document.querySelector(".player-age");
+    if (ageEl) {
+      const { age, birthdayDay } = parseAgeString(ageEl.textContent || "");
+      const r = computeRetireSeasonFrom(age, birthdayDay);
+      retireSeason = r.finalSeason; // pode ser null se idade for desconhecida
     }
 
-    function calcSeason(req) {
+    function setSeason(span, req, label) {
+      // já atingiu esse coração → ✔
+      if (games >= req) {
+        span.textContent = "✔";
+        span.style.color = "#76ff76";
+      } else {
+        span.textContent = label;
+        span.style.color = "";
+      }
+    }
+
+    // devolve "Sx" ou "❌" se só der para depois da reforma
+    function labelFor(req) {
+      const gd = calculateGameDate();
       const missing = Math.max(0, req - games);
       const seasonsNeeded = Math.ceil(missing / 50);
-      const gd = calculateGameDate();
-      return "S" + (gd.season + seasonsNeeded);
+      const seasonReached = gd.season + seasonsNeeded;
+
+      if (retireSeason !== null && seasonReached > retireSeason) {
+        return "❌";
+      }
+      return "S" + seasonReached;
     }
 
-    setSeason(smallSeason, smallReq, calcSeason(smallReq));
-    setSeason(bigSeason,   bigReq,   calcSeason(bigReq));
-    setSeason(goldSeason,  goldReq,  calcSeason(goldReq));
-    setSeason(platSeason,  platReq,  calcSeason(platReq));
+    setSeason(smallSeason, smallReq, labelFor(smallReq));
+    setSeason(bigSeason,   bigReq,   labelFor(bigReq));
+    setSeason(goldSeason,  goldReq,  labelFor(goldReq));
+    setSeason(platSeason,  platReq,  labelFor(platReq));
   }
+
 
   if (gameOkBtn) {
     gameOkBtn.addEventListener("click", () => {
@@ -910,17 +938,39 @@ function computeMaxCareerHeart() {
   if (birthdayDay && birthdayDay > gd.day) seasonsLeft -= 1;
   const retireSeason = currentSeason + Math.max(seasonsLeft, 0);
 
-  let icon = "❌";
-  let finalSeason = "—";
+  let icon = null;
+  let finalSeason = null;
 
-  if (platSeason <= retireSeason) { icon = "💙"; finalSeason = "S" + platSeason; }
-  else if (goldSeason <= retireSeason) { icon = "💛"; finalSeason = "S" + goldSeason; }
-  else if (bigSeason <= retireSeason) { icon = "❤️"; finalSeason = "S" + bigSeason; }
-  else if (smallSeason <= retireSeason) { icon = "❤️"; finalSeason = "S" + smallSeason; }
+  if (platSeason <= retireSeason) {
+    icon = ICON_PLAT_HTML;
+    finalSeason = "S" + platSeason;
+
+  } else if (goldSeason <= retireSeason) {
+    icon = ICON_GOLD_HTML;
+    finalSeason = "S" + goldSeason;
+
+  } else if (bigSeason <= retireSeason) {
+    icon = ICON_BIG_HTML;
+    finalSeason = "S" + bigSeason;
+
+  } else if (smallSeason <= retireSeason) {
+    icon = ICON_SMALL_HTML; // ❤️ pequeno com classe especial
+    finalSeason = "S" + smallSeason;
+  }
+
 
   const maxLine = document.querySelector(".max-heart-final");
-  if (maxLine) maxLine.innerHTML = `MAX HEART POSSIBLE: <span class="blue-heart">${icon}</span> (${finalSeason})`;
+  if (!maxLine) return;
+
+  // Se NÃO consegue nenhum → mostrar "—"
+  if (!icon) {
+    maxLine.innerHTML = `MAX HEART POSSIBLE: —`;
+    return;
+  }
+
+  maxLine.innerHTML = `MAX HEART POSSIBLE: ${icon} (${finalSeason})`;
 }
+
 
 /* ---------------- INIT ---------------- */
 renderAllEquipmentUI();
