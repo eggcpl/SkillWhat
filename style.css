@@ -214,19 +214,24 @@ body {
 }
 
 .input-box {
-    width: 100px;
-    height: 150px;     /* ajusta mais tarde */
+    position: absolute;
+    left: 174px;
+    top: -33px;
+    width: 40px;
+    height: 220px;     /* ajusta mais tarde */
     padding: 10px;       
     border: none;
     resize: none;
     font-size: 10px;
     outline: none;
-    background: #e5dfcc; 
+    background: #e5dfcc;
+    border-radius: 21px 0px 0px 21px;
 }
 
 /* Scroll bonito para a input-box */
 .input-box::-webkit-scrollbar {
-    width: 7px;               /* largura da barra */
+    width: 7px;
+    height: 10px;               /* largura da barra */
 }
 
 .input-box::-webkit-scrollbar-track {
@@ -236,20 +241,44 @@ body {
 
 .input-box::-webkit-scrollbar-thumb {
     background: #f56e0e;      /* cor da barra */
-    border-radius: 10px;      /* EXTREMAMENTE importante para ficar bonito */
+    border-radius: 0px;      /* EXTREMAMENTE importante para ficar bonito */
 }
+.missing-popup {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  padding: 20px;
+  border-radius: 10px;
+  display: none;
+}
+
+.missing-popup:not(.hidden) {
+  display: block;
+}
+
+.missing-row {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
 
 .input-box::-webkit-scrollbar-thumb:hover {
     background: #f56e0e;      /* cor ao passar o rato */
 }
 
 .load-btn {
-    width: 120px;
+    position: absolute;
+    left: 174px;
+    top: 208px;
+    width: 60px;
     height: 30px;
-    border-radius: 0 0 12px 12px;
+    border-radius: 21px 0 21px 0px;
     border: none;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     background: #f56e0eff;
     transition: 0.2s ease; 
@@ -928,4 +957,181 @@ filter: brightness(1.2);
     transition: 0.2s ease;
     filter: invert(57%) sepia(74%) saturate(2500%) hue-rotate(5deg) brightness(105%) contrast(105%);
 
+}
+
+/* ===== GLOBAL SKILL EDIT COLUMN ===== */
+.global-edit-col {
+    position: absolute;
+    right: 26px;        /* ajusta para alinhar com as tuas rows */
+    top: 215px;         /* 🔥 este valor controla a altura da coluna */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 20;
+}
+
+.global-mode-btn {
+    width: 32px;
+    height: 26px;
+    border-radius: 6px;
+    border: none;
+    background: #e5dfcc;
+    box-shadow: 0 2px 0 #cfc6ad;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+.global-edit-row {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+
+.global-edit-btn {
+    width: 26px;
+    height: 22px;
+    border-radius: 6px;
+    border: none;
+    background: #f56e0e;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.1s;
+}
+
+.global-edit-btn:hover {
+    background: #ff7f2f;
+}
+
+/* COLUNA GLOBAL */
+.skill-edit-column {
+    position: absolute;
+    right: 210px;
+    top: 224px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 50;
+
+}
+
+/* Espaçamento IGUAL ao das skill rows */
+.edit-row {
+    display: flex;
+    gap: 6px;              /* espaço entre - e + */
+    height: 21.5px;          /* igual à altura aproximada da skill row */
+    margin-bottom: px;    /* escolhe 6–10px conforme o gosto */
+    align-items: center;
+}
+
+.mode-toggle {
+    position: absolute;
+    right: -0,5px;
+    top: -34px;
+    height: 35px;                 /* controla apenas a altura */
+    aspect-ratio: 1 / 1;        /* proporção do botão S/L real */
+    background-size: contain;     
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border: none;                 /* remove borda */
+    padding: 0;                   /* remove espaço interno */
+    margin: 0;
+
+    background-color: transparent; /* tira fundo branco */
+    color: transparent;            /* esconde texto S */
+    font-size: 0;                  /* garante que texto não aparece */
+    cursor: pointer;
+}
+
+.edit-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.edit-btn-img {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    user-select: none;
+}
+
+#missing-skill-popup {
+    position: flex !important;
+    z-index: 999999 !important;
+    top: 40%;
+    left: 73%;
+    color: white;
+    transform: translate(-50%, -50%);
+    background: #1c1c1e;
+    font-family: inherit;
+    border: 2px solid #8e8e8e;
+    text-align: right;   /* 👈 agora fica centrado */
+    font-size: 12px; /* ajusta como quiseres */
+}
+
+#missing-skill-popup .missing-row span {
+    font-size: 14px;
+    color: white;
+    text-align: right;
+    display: inline-block;
+    width: 120px;  /* ajusta conforme o layout */
+    padding-right: 6px;
+}
+
+/* título */
+#missing-skill-popup h2 {
+    color: white !important;
+    margin-bottom: 15px;
+      font-size: 1px; /* ajusta como quiseres */
+}
+
+#missing-skill-popup input::placeholder {
+    color: transparent;
+}
+#missing-skill-popup input[type="number"]::-webkit-inner-spin-button,
+#missing-skill-popup input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* nome da skill */
+.missing-row span {
+    color: white;
+    font-size: 16px;
+    text-align: RIGHT !important;
+}
+
+/* input dos limites */
+.missing-row input {
+    width: 30px;       /* MAIS PEQUENO */
+    font-size: 13px;
+    border-radius: 6px;
+    border: 1px solid #888;
+    background: #fff;
+    text-align: center;
+}
+
+/* OK igual ao LOAD BUTTON */
+#missing-skill-confirm {
+    position: absolute;
+    left: 0px;
+    top: 201px;
+    width: 50px;
+    height: 20px;
+    border-radius: 0px 7px 0px 7px;
+    border: none;
+    font-size: 13;
+    font-weight: 600;
+    cursor: pointer;
+    background: #f56e0eff;
+    transition: 0.2s ease;
+}
+
+#missing-skill-confirm:hover {
+    background: #edeec0ff; /* a cor que pediste */
+    box-shadow: 0 0 12px rgba(238, 223, 192, 0.8); /* brilho suave */
 }

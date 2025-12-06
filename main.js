@@ -27,6 +27,11 @@ let skills = [
 // backup of the initial skills to allow LOAD (empty) to fully restore initial state
 const initialSkillsBackup = JSON.parse(JSON.stringify(skills));
 
+// backup do último LOAD
+let loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
+let loadedName = "Legend";
+let loadedAge = "19yo (day 5)";
+
 const skillsList = document.getElementById("skills-list");
 const totalCurrent = document.getElementById("total-skill-current");
 const totalMax = document.getElementById("total-skill-max");
@@ -108,26 +113,73 @@ function updateTotals() {
     if (totalMax) totalMax.textContent = "/" + totalMaxValue;
 }
 
-/* ---------------- PARSER ---------------- */
-function parseCardText(txt) {
-  const lines = txt.split("\n").map(l => l.trim()).filter(Boolean);
-  const skillNames = ["Aim", "Handling", "Quickness", "Determination", "Awareness", "Teamplay", "Gamesense", "Movement"];
-  const parsed = [];
-  for (let i = 0; i < lines.length; i++) {
-    if (skillNames.includes(lines[i])) {
-      parsed.push({
-        name: lines[i],
-        value: parseInt(lines[i + 1], 10) || 0,
-        max: parseInt(lines[i + 2] ? lines[i + 2].replace("/", "") : "0", 10) || 0
-      });
+
+
+
+    function parseCardText(txt) {
+    const lines = txt
+        .split("\n")
+        .map(l => l.trim())
+        .filter(l => l.length > 0); // remove vazios
+
+    const skillNames = [
+        "Aim", "Handling", "Quickness", "Determination",
+        "Awareness", "Teamplay", "Gamesense", "Movement"
+    ];
+
+    const parsed = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // -----------------------------------
+        // 1) FORMATO INLINE: "Skill 42/?"
+        // -----------------------------------
+        const inlineMatch = line.match(/^(\w+)\s+(\d+)\s*\/\s*(\d+|\?)$/i);
+        if (inlineMatch && skillNames.includes(inlineMatch[1])) {
+            const name = inlineMatch[1];
+            const value = parseInt(inlineMatch[2], 10);
+            const rawMax = inlineMatch[3];
+            const max = rawMax === "?" ? null : parseInt(rawMax, 10);
+
+            parsed.push({ name, value, max });
+            continue;
+        }
+
+        // -----------------------------------
+        // 2) FORMATO 3 LINHAS:
+        // Skill
+        // 42
+        // /93   ou   / ?   ou   ?
+        // -----------------------------------
+        if (skillNames.includes(line)) {
+            const name = line;
+
+            const valLine = lines[i + 1] || "";
+            const maxLine = lines[i + 2] || "";
+
+            const value = parseInt(valLine, 10) || 0;
+
+            // extrai apenas número ou ?
+            let rawMax = maxLine.replace("/", "").trim();
+            const max = rawMax === "?" ? null : (parseInt(rawMax, 10) || 0);
+
+            parsed.push({ name, value, max });
+        }
     }
-  }
-  return {
-    playerName: lines[0] || "Unknown",
-    playerAge: lines.find(l => /yo/.test(l)) || "",
-    skills: parsed
-  };
+
+    return {
+        playerName: lines[0] || "Unknown",
+        playerAge: lines.find(l => /yo/.test(l)) || "",
+        skills: parsed
+    };
 }
+
+
+
+
+
+
 
 /* ---------------- PLAYER AGE PARSING & RETIRE CALC ---------------- */
 function parseAgeString(ageStr) {
@@ -319,9 +371,162 @@ if (finalVal >= 100) {
 
     skillsList.appendChild(row);
   });
+// ===== UPDATE RIGHT COLUMN BUTTONS (ONLY IMAGE BUTTONS) =====
+if (globalButtonsContainer) {
+    globalButtonsContainer.innerHTML = "";
+
+    skills.forEach((s, index) => {
+        const row = document.createElement("div");
+        row.className = "edit-row";
+
+        // BOTÃO MENOS
+        const minus = document.createElement("img");
+        minus.src = "https://i.postimg.cc/qBCQ18DZ/button.png";
+        minus.className = "edit-btn-img";
+        minus.addEventListener("click", () => applySkillChange(index, -1));
+
+        // BOTÃO MAIS
+        const plus = document.createElement("img");
+        plus.src = "https://i.postimg.cc/SQzVgW1v/button.png";
+        plus.className = "edit-btn-img";
+        plus.addEventListener("click", () => applySkillChange(index, +1));
+
+        row.appendChild(minus);
+        row.appendChild(plus);
+        globalButtonsContainer.appendChild(row);
+    });
+}
+
+
 
   updateTotals();
 }
+
+/* ==========================
+   GLOBAL EDIT COLUMN LOGIC
+========================== */
+
+let globalMode = "S"; // S = editar value, L = editar max
+const globalModeBtn = document.getElementById("mode-btn");
+const globalButtonsContainer = document.getElementById("edit-buttons-container");
+
+function updateModeButton() {
+    if (globalMode === "S") {
+        globalModeBtn.style.backgroundImage =
+            "url('https://i.postimg.cc/BQFFWpxs/Sbutton.png')";
+    } else {
+        globalModeBtn.style.backgroundImage =
+            "url('https://i.postimg.cc/vHnnRhWy/Lbutton.png')";
+    }
+}
+
+globalModeBtn.addEventListener("click", () => {
+    globalMode = globalMode === "S" ? "L" : "S";
+    updateModeButton();
+});
+
+updateModeButton();
+
+
+
+
+
+function applySkillChange(idx, delta) {
+    const s = skills[idx];
+
+    let turnMaxModeOffAfterChange = false;
+
+    /* ================================
+       SE MAX MODE ESTIVER ATIVO
+       ================================ */
+if (maxMode) {
+    // guardar valor real original apenas 1 vez
+    if (s._backupValue === undefined) s._backupValue = s.value;
+
+    // valor a editar passa a ser o MAX (valor visível em MAX MODE)
+    s.value = s.max;
+
+    turnMaxModeOffAfterChange = true;
+}
+
+    /* ================================
+       REGRAS S
+       ================================ */
+    if (globalMode === "S") {
+
+        if (delta === 1 && s.value === s.max && s.value < 100) {
+            // S+ quando value == max → sobem ambos
+            s.value++;
+            s.max++;
+        }
+
+        else if (delta === -1 && s.value === s.max) {
+            // S- quando value == max → desce só o value
+            if (s.value > 0) s.value--;
+        }
+
+        else if (delta === 1 && s.value < s.max && s.value < 100) {
+            // S+ normal
+            s.value++;
+        }
+
+        else if (delta === -1 && s.value > 0) {
+            // S- normal
+            s.value--;
+        }
+    }
+
+    /* ================================
+       REGRAS L
+       ================================ */
+    else {
+
+        if (delta === 1 && s.max === s.value && s.max < 100) {
+            // L+ quando max == value → só sobe max
+            s.max++;
+        }
+
+        else if (delta === -1 && s.max === s.value && s.max > 0) {
+            // L- quando max == value → descem ambos
+            s.max--;
+            s.value--;
+        }
+
+        else if (delta === 1 && s.max < 100) {
+            // L+ normal
+            s.max++;
+        }
+
+        else if (delta === -1 && s.max > s.value) {
+            // L- normal
+            s.max--;
+        }
+    }
+
+    /* ================================
+       LIMITE FINAL (0–100)
+       ================================ */
+    s.value = Math.max(0, Math.min(100, s.value));
+    s.max   = Math.max(0, Math.min(100, s.max));
+
+    /* ================================
+       SE FIZ CLICK EM +/– NO MAX MODE
+       → DESLIGAR MAX MODE AUTOMATICAMENTE
+       ================================ */
+    if (turnMaxModeOffAfterChange) {
+        maxMode = false;
+        maxBtn.classList.remove("max-active");
+
+        // atualizar o backup para o novo valor real
+        s._backupValue = s.value;
+    }
+    updateTotals();
+    renderSkills();
+    computeMaxCareerHeart();
+}
+
+
+
 
 
 /* ---------------- TOOLTIP ---------------- */
@@ -423,7 +628,9 @@ if (loadBtn) {
 
         // restore skills to the initial backup (deep copy)
         skills = JSON.parse(JSON.stringify(initialSkillsBackup));
-
+loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
+loadedName = "Legend";
+loadedAge = "19yo (day 5)";
         // recompute and refresh UI
         recomputeEquipmentBoosts();
         renderAllEquipmentUI();
@@ -450,6 +657,15 @@ if (loadBtn) {
       skills = data.skills;
     }
 
+    // detectar skills com max = null
+const incomplete = skills.filter(s => s.max === null);
+if (incomplete.length > 0) {
+    openMissingSkillPopup(incomplete);
+    return; // evita continuar o LOAD até preencher
+}
+loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
+loadedName = data.playerName;
+loadedAge = data.playerAge;
     // ensure UI and calculations updated
     recomputeEquipmentBoosts();
     renderAllEquipmentUI();
@@ -481,9 +697,26 @@ if (maxBtn) {
   maxBtn.addEventListener("click", () => {
     maxMode = !maxMode;
     maxBtn.classList.toggle("max-active");
+
+    skills.forEach(s => {
+      if (maxMode) {
+        // guardar valor original
+        s._backupValue = s.value;
+
+        // value passa a ser igual ao max
+        s.value = s.max;
+      } else {
+        // restaurar o valor original
+        if (s._backupValue !== undefined) {
+          s.value = s._backupValue;
+        }
+      }
+    });
+
     renderSkills();
   });
 }
+
 /* ---------------- EQUIPMENT ICONS ---------------- */
 const GEAR_ICONS = {
   mousepad: "https://i.postimg.cc/W4SQ1NJV/mp1.png",
@@ -617,6 +850,48 @@ function updateGamesButtonState() {
     gamesBtn.classList.remove("games-active");
   }
 }
+function openMissingSkillPopup(list) {
+    const popup = document.getElementById("missing-skill-popup");
+    const container = document.getElementById("missing-skill-fields");
+
+    container.innerHTML = "";
+
+    list.forEach(s => {
+        const div = document.createElement("div");
+        div.className = "missing-row";
+        div.innerHTML = `
+            <span>${s.name}</span>
+            <input type="number" min="1" max="100" id="miss-${s.name}" placeholder="limit">
+        `;
+        container.appendChild(div);
+    });
+
+    popup.classList.remove("hidden");
+
+    document.getElementById("missing-skill-confirm").onclick = () => {
+        let allGood = true;
+
+        list.forEach(s => {
+            const field = document.getElementById(`miss-${s.name}`);
+            const val = parseInt(field.value, 10);
+
+            if (!val || val < 1 || val > 100) {
+                allGood = false;
+                field.style.border = "1px solid red";
+            } else {
+                field.style.border = "";
+                s.max = val;
+            }
+        });
+
+        if (!allGood) return;
+
+        popup.classList.add("hidden");
+        renderSkills();
+        computeMaxCareerHeart();
+    };
+}
+
 
 /* ---------------- POPUP (open / apply / drag / lock / outside click) ---------------- */
 const gearPopup = document.getElementById("gear-popup");
@@ -764,12 +1039,11 @@ if (rubber) {
     renderAllEquipmentUI();
     updateGearButtonState();
 
-    // RESET GEAR POPUP
+    // RESET POPUPS
     gearLocked = false;
     if (lockBtn) lockBtn.textContent = "🔓";
     if (gearPopup) gearPopup.classList.add("hidden");
 
-    // RESET GAME POPUP
     gameLocked = false;
     const gameLockBtn = document.getElementById("game-lock-btn");
     if (gameLockBtn) gameLockBtn.textContent = "🔓";
@@ -781,6 +1055,8 @@ if (rubber) {
 
     if (gameInput) gameInput.value = "";
     if (gamesPlayedEl) gamesPlayedEl.textContent = "0";
+
+    updateGamesButtonState();
 
     // RESET HEART SEASONS
     const small = document.querySelector(".season-small");
@@ -800,14 +1076,23 @@ if (rubber) {
     if (gameImgBtn)   gameImgBtn.classList.remove("active");
     if (loyalStatusEl) loyalStatusEl.textContent = "NO";
 
-    // RESET BUTTON BRIGHTNESS
-    updateGamesButtonState();
+  // RESTAURAR ESTADO BASE DO ÚLTIMO LOAD
+skills = JSON.parse(JSON.stringify(loadedSkillsBackup));
+
+const nameEl = document.querySelector(".player-name");
+const ageEl  = document.querySelector(".player-age");
+
+if (nameEl) nameEl.textContent = loadedName;
+if (ageEl)  ageEl.textContent  = loadedAge;
+
 
     // REFRESH UI
     renderSkills();
     computeMaxCareerHeart();
+    updateRetireDisplayIfNeeded();
   });
 }
+
 
 /* --- DOM READY: setup loyal + games input listeners --- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -835,56 +1120,78 @@ document.addEventListener('DOMContentLoaded', () => {
   const goldSeason  = document.querySelector(".season-gold");
   const platSeason  = document.querySelector(".season-plat");
 
-  function updateHeartsBasedOnGames(games) {
+function updateHeartsBasedOnGames(games) {
+    const smallSeason = document.querySelector(".season-small");
+    const bigSeason   = document.querySelector(".season-big");
+    const goldSeason  = document.querySelector(".season-gold");
+    const platSeason  = document.querySelector(".season-plat");
+
     if (!smallSeason || !bigSeason || !goldSeason || !platSeason) return;
 
     const loyal = document.getElementById("loyal-status").textContent === "YES";
+
     let smallReq = 100, bigReq = 200, goldReq = 400, platReq = 800;
+
     if (loyal) {
-      smallReq = Math.floor(smallReq * 0.75);
-      bigReq = Math.floor(bigReq * 0.75);
-      goldReq = Math.floor(goldReq * 0.75);
-      platReq = Math.floor(platReq * 0.75);
+        smallReq = Math.floor(smallReq * 0.75);
+        bigReq   = Math.floor(bigReq * 0.75);
+        goldReq  = Math.floor(goldReq * 0.75);
+        platReq  = Math.floor(platReq * 0.75);
     }
 
-    // ---- calcular season de reforma ----
-    let retireSeason = null;
-    const ageEl = document.querySelector(".player-age");
-    if (ageEl) {
-      const { age, birthdayDay } = parseAgeString(ageEl.textContent || "");
-      const r = computeRetireSeasonFrom(age, birthdayDay);
-      retireSeason = r.finalSeason; // pode ser null se idade for desconhecida
+    const ageText = document.querySelector(".player-age")?.textContent || "";
+    const { age, birthdayDay } = parseAgeString(ageText);
+
+    const gd = calculateGameDate();
+    const currentSeason = gd.season;
+
+    // calcular season de reforma
+    const retireSeason = computeRetireSeasonFrom(age, birthdayDay).finalSeason;
+
+    // calcula season destino consoante jogos restantes
+    function targetSeason(req) {
+        const missing = Math.max(0, req - games);
+        const seasonsNeeded = Math.ceil(missing / 50);
+        return currentSeason + seasonsNeeded;
     }
 
-    function setSeason(span, req, label) {
-      // já atingiu esse coração → ✔
-      if (games >= req) {
-        span.textContent = "✔";
-        span.style.color = "#76ff76";
-      } else {
-        span.textContent = label;
-        span.style.color = "";
-      }
+    function label(req) {
+        const season = targetSeason(req);
+
+        if (season > retireSeason) return "❌";
+
+        const futureAge = age + (season - currentSeason);
+
+        // SE ainda não atingido → mostra season + idade
+        if (games < req) return `S${season} (${futureAge}yo)`;
+
+        // SE já atingido → ✔
+        return "✔";
     }
 
-    // devolve "Sx" ou "❌" se só der para depois da reforma
-    function labelFor(req) {
-      const gd = calculateGameDate();
-      const missing = Math.max(0, req - games);
-      const seasonsNeeded = Math.ceil(missing / 50);
-      const seasonReached = gd.season + seasonsNeeded;
+    smallSeason.textContent = label(smallReq);
+    bigSeason.textContent   = label(bigReq);
+    goldSeason.textContent  = label(goldReq);
+    platSeason.textContent  = label(platReq);
 
-      if (retireSeason !== null && seasonReached > retireSeason) {
-        return "❌";
-      }
-      return "S" + seasonReached;
-    }
+    // cores ✔ e ❌
+    [smallSeason, bigSeason, goldSeason, platSeason].forEach((el, i) => {
+        const req = [smallReq, bigReq, goldReq, platReq][i];
 
-    setSeason(smallSeason, smallReq, labelFor(smallReq));
-    setSeason(bigSeason,   bigReq,   labelFor(bigReq));
-    setSeason(goldSeason,  goldReq,  labelFor(goldReq));
-    setSeason(platSeason,  platReq,  labelFor(platReq));
-  }
+        if (games >= req) {
+            el.style.color = "#76ff76"; // verde ✔
+        } else if (el.textContent === "❌") {
+            el.style.color = ""; // normal
+        } else {
+            el.style.color = ""; // normal season + idade
+        }
+    });
+}
+
+
+
+
+    
 
 
   if (gameOkBtn) {
@@ -897,7 +1204,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateGamesButtonState();
     });
   }
-
+updateHeartsBasedOnGames(0);
   updateRetireDisplayIfNeeded();
   updateGamesButtonState();
 });
@@ -979,3 +1286,4 @@ updateGearButtonState();
 renderSkills();
 computeMaxCareerHeart();
 updateGamesButtonState();
+updateHeartsBasedOnGames(0);

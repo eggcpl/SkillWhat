@@ -52,8 +52,18 @@
                     <span id="total-skill-max" class="max">/0</span>
                 </div>
             </div>
-
+<div id="missing-skill-popup" class="missing-popup hidden">
+  <div class="missing-popup-inner">
+    <h3>Missing Limits</h3>
+    <div id="missing-skill-fields"></div>
+    <button id="missing-skill-confirm">OK</button>
+  </div>
+</div>
             <div id="skills-list" class="skills-list"></div>
+            <div class="skill-edit-column">
+    <button id="mode-btn" class="mode-toggle">S</button>
+    <div id="edit-buttons-container"></div>
+</div>
 
         </div>
 
@@ -137,7 +147,7 @@
                 <button id="game-img-btn" class="game-img-btn"></button>
 
                 <div class="game-row">
-                    <span class="game-label">GAMES: </span>
+                    <span class="game-label">GAMES:</span>
                     <input id="game-input" class="game-input" type="number" min="0" max="1000" placeholder="0">
                     <button id="game-ok" class="game-ok">OK</button>
                 </div>
