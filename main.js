@@ -1143,12 +1143,38 @@ document.addEventListener('DOMContentLoaded', () => {
     gameImgBtn.classList.remove('active');
     if (loyalStatusEl) loyalStatusEl.textContent = 'NO';
 
-    gameImgBtn.addEventListener('click', () => {
-      const isOn = gameImgBtn.classList.toggle('active');
-      if (loyalStatusEl) loyalStatusEl.textContent = isOn ? 'YES' : 'NO';
-      computeMaxCareerHeart();
-      updateGamesButtonState();
-    });
+    let originalGamesBeforeLoyal = null;
+
+gameImgBtn.addEventListener('click', () => {
+    const isOn = gameImgBtn.classList.toggle('active');
+    const loyalStatusEl = document.getElementById("loyal-status");
+    const gamesPlayedEl = document.getElementById("games-played");
+
+    if (loyalStatusEl) loyalStatusEl.textContent = isOn ? 'YES' : 'NO';
+
+    let games = parseInt(gamesPlayedEl.textContent, 10) || 0;
+
+    if (isOn) {
+        // guardar valor real antes do desconto
+        originalGamesBeforeLoyal = games;
+
+        // aplicar desconto 25%
+        const reduced = Math.floor(games * 0.75);
+        gamesPlayedEl.textContent = reduced;
+
+        updateHeartsBasedOnGames(reduced);
+    } else {
+        // restaurar valor original
+        if (originalGamesBeforeLoyal !== null) {
+            gamesPlayedEl.textContent = originalGamesBeforeLoyal;
+            updateHeartsBasedOnGames(originalGamesBeforeLoyal);
+        }
+    }
+
+    computeMaxCareerHeart();
+    updateGamesButtonState();
+});
+
   }
 
   const gameInput = document.getElementById("game-input");
