@@ -206,7 +206,7 @@ function updateTotals() {
 
 
 function positionInfoTooltip(e) {
-    infoTooltip.style.left = (e.pageX - 00) + "px";
+    infoTooltip.style.left = (e.pageX - 100) + "px";
     infoTooltip.style.top = (e.pageY + 15) + "px";
 }
 
