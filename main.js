@@ -203,27 +203,10 @@ function updateTotals() {
     if (totalMax) totalMax.textContent = "/" + totalMaxValue;
 }
 
-const infoBtn = document.getElementById("info-btn");
-const infoTooltip = document.getElementById("info-tooltip");
 
-if (infoBtn && infoTooltip) {
-
-    infoBtn.addEventListener("mouseenter", (e) => {
-        infoTooltip.classList.remove("hidden");
-        positionInfoTooltip(e);
-    });
-
-    infoBtn.addEventListener("mousemove", (e) => {
-        positionInfoTooltip(e);
-    });
-
-    infoBtn.addEventListener("mouseleave", () => {
-        infoTooltip.classList.add("hidden");
-    });
-}
 
 function positionInfoTooltip(e) {
-    infoTooltip.style.left = (e.pageX - 800) + "px";
+    infoTooltip.style.left = (e.pageX - 00) + "px";
     infoTooltip.style.top = (e.pageY + 15) + "px";
 }
 
@@ -1527,6 +1510,24 @@ function computeMaxCareerHeart() {
 
   maxLine.innerHTML = `MAX HEART POSSIBLE: ${icon} (${finalSeason})`;
 }
+// ===== INFO TOOLTIP (STABLE, NO FLICKER) =====
+const infoWrapper = document.getElementById("info-wrapper");
+const infoTooltip = document.getElementById("info-tooltip");
+const overlay = document.getElementById("modal-overlay");
+
+if (infoWrapper && infoTooltip && overlay) {
+
+  infoWrapper.addEventListener("mouseenter", () => {
+    infoTooltip.classList.remove("hidden");
+    overlay.classList.remove("hidden");
+  });
+
+  infoWrapper.addEventListener("mouseleave", () => {
+    infoTooltip.classList.add("hidden");
+    overlay.classList.add("hidden");
+  });
+
+}
 
 window.addEventListener("load", () => {
   const versionEl = document.getElementById("app-version");
@@ -1545,6 +1546,7 @@ window.addEventListener("load", () => {
     li.textContent = u;
     updatesEl.appendChild(li);
   });
+  
 });
 /* ---------------- INIT ---------------- */
 document.addEventListener("DOMContentLoaded", () => {

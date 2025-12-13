@@ -15,7 +15,7 @@
 </head>
 
 <body>
-
+<div id="modal-overlay" class="modal-overlay hidden"></div>
     <div class="card">
 
         <!-- PLAYER HEADER -->
@@ -80,22 +80,19 @@
 
         </div>
 
-        <div class="left-panel">
+<div class="left-panel">
 
-    <!-- BOTÃO I -->
-    <button id="info-btn" class="info-btn"></button>
+    <div id="info-wrapper">
+        <button id="info-btn" class="info-btn"></button>
+
+        <div id="info-tooltip" class="info-tooltip hidden">
+            <img src="https://i.postimg.cc/7hk6q2FL/image1.png">
+        </div>
+    </div>
 
     <textarea id="skill-input" class="input-box" placeholder="past here"></textarea>
     <button id="load-button" class="load-btn">LOAD</button>
 </div>
-
-<!-- TOOLTIP DA INFO -->
-<div id="info-tooltip" class="info-tooltip hidden">
-    <img src="https://i.postimg.cc/7hk6q2FL/image1.png">
-</div>
-
-    </div>
-
     <!-- TOOLTIP -->
     <div id="skill-tooltip" class="skill-tooltip hidden">
         <div class="tooltip-title-row">

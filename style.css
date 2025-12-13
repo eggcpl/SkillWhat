@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@700&display=swap');
-
+/* BLOQUEIO TOTAL GLOBAL */
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
 * {
     font-family: "Poppins", sans-serif;
 }
@@ -1168,6 +1174,7 @@ filter: brightness(1.2);
     border: 2px solid #8e8e8e;
     width: 800px;      /* 👈 define o tamanho DO TOOLTIP */
     height: auto;      /* ou define altura fixa se quiseres */
+    z-index: 9999; /* 👈 MAIS ALTO QUE O OVERLAY */
 }
 
 .info-tooltip img {
@@ -1178,6 +1185,17 @@ filter: brightness(1.2);
     display: block;
     border-radius: 10px;
     object-fit: contain;
+     z-index: 9999;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  z-index: 9998;
+  pointer-events: none; /* 🔥 CRÍTICO */
 }
 
 .hidden {
@@ -1216,19 +1234,20 @@ filter: brightness(1.2);
   position: relative;
 }
 
-.version-updates li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #ff7a00;
+.info-tooltip {
+    position: fixed;          /* 🔥 FIXO no ecrã */
+    top: 90px;                /* 👈 sobe/desce */
+    left: 40px;               /* 👈 MAIS À ESQUERDA */
+    width: 800px;             /* 👈 TAMANHO REAL */
+    background: none;
+    padding: 0;
+    border-radius: 10px;
+    border: 2px solid #8e8e8e;
+    z-index: 9999;
+    pointer-events: auto;
 }
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.8);
-  z-index: 99998;
+.info-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 9999;
 }
