@@ -65,9 +65,8 @@ body {
 
 }
 .total-skill-box .label {
-    color: #758572;
     font-size: 12px;    /* 🔥 ajusta aqui */
-    color: #758572;     /* continua o cinzento certo */
+    color: #818572;     /* continua o cinzento certo */
     font-weight: 700;
 }
 
@@ -158,6 +157,10 @@ body {
     0 0 12px rgba(238, 223, 192, 0.8); /* brilho suave */
 }
 
+.skill-name.limit-reached {
+    color: #9adc00;
+}
+
 
 .skill-limit.full {
     border-radius: 999px !important;
@@ -245,9 +248,9 @@ body {
 }
 .missing-popup {
   position: fixed;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 300x;
+  left: 300px;
+  transform: none;
   background: #222;
   padding: 20px;
   border-radius: 10px;
@@ -334,7 +337,7 @@ body {
     border-radius: 12px;
     border: none;
     cursor: pointer;
-    box-shadow: 0px 4px 0px #cfc6ad;
+    box-shadow: 0px 0px 0px #cfc6ad;
     transition: 0.15s ease-in-out;
 }
 
@@ -810,10 +813,12 @@ filter: brightness(1.2);
     width: 30px;
     height: 30px;
     background-image: url('https://i.postimg.cc/90FZFDm7/LOYAL.png'); /* <-- substitui pelo link da imagem */
-    background-size: contain;
+    background-size: 70%;
     background-position: center;
     background-repeat: no-repeat;
-
+    position: absolute;
+    left: 195px;
+    top: 173px;
     border: none;
     border-radius: 6px;
 
@@ -1063,8 +1068,8 @@ filter: brightness(1.2);
 #missing-skill-popup {
     position: flex !important;
     z-index: 999999 !important;
-    top: 40%;
-    left: 82%;
+    top: 30%;
+    left: 45%;
     color: white;
     transform: translate(-50%, -50%);
     background: #1c1c1e;
@@ -1119,7 +1124,7 @@ filter: brightness(1.2);
 #missing-skill-confirm {
     position: absolute;
     left: 0px;
-    top: 201px;
+    top: 168px;
     width: 50px;
     height: 20px;
     border-radius: 0px 7px 0px 7px;
@@ -1170,4 +1175,53 @@ filter: brightness(1.2);
 
 .hidden {
     display: none;
+}
+.version-box {
+  margin-top: 12px;
+  padding: 10px 12px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #d0d0d0;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  position: absolute;
+  top: 470px; /* abaixo da card (459px) */
+  left: 20px;
+  z-index: 1;
+}
+
+.version-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #f7f8c9;
+  margin-bottom: 6px;
+}
+
+.version-updates {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.version-updates li {
+  margin-bottom: 4px;
+  padding-left: 10px;
+  position: relative;
+}
+
+.version-updates li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #ff7a00;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.8);
+  z-index: 99998;
 }

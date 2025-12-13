@@ -1,18 +1,104 @@
+// ===== FORCE VERSION RENDER (ISOLATED) =====
+
+// ===== END FORCE VERSION =====
 // Icons para MAX HEART POSSIBLE
 const ICON_SMALL_HTML = '<span class="heart-small2">❤️</span>';
 const ICON_BIG_HTML   = '❤️';
 const ICON_GOLD_HTML  = '💛';
 const ICON_PLAT_HTML  = '💙';
 
-/* main.js — clean, final version (with retire calculation added) */
+function updateHeartsBasedOnGames(games) {
+    const smallSeason = document.querySelector(".season-small");
+    const bigSeason   = document.querySelector(".season-big");
+    const goldSeason  = document.querySelector(".season-gold");
+    const platSeason  = document.querySelector(".season-plat");
 
-/*
-  Final notes:
-  - LOAD (when input empty) restores the exact initial state (option A chosen).
-  - initialSkillsBackup stores the original skills defined at top.
-  - TOTAL SKILL (updateTotals) sums only base values (or max when maxMode active) — it does NOT include heart/morale/gear.
-*/
+    if (!smallSeason || !bigSeason || !goldSeason || !platSeason) return;
 
+    const loyal = document.getElementById("loyal-status").textContent === "YES";
+
+    let smallReq = 100, bigReq = 200, goldReq = 400, platReq = 800;
+
+    if (loyal) {
+        smallReq = Math.floor(smallReq * 0.75);
+        bigReq   = Math.floor(bigReq * 0.75);
+        goldReq  = Math.floor(goldReq * 0.75);
+        platReq  = Math.floor(platReq * 0.75);
+    }
+
+    const ageText = document.querySelector(".player-age")?.textContent || "";
+    const { age, birthdayDay } = parseAgeString(ageText);
+
+    const gd = calculateGameDate();
+    const currentSeason = gd.season;
+
+    // calcular season de reforma
+    const retireSeason = computeRetireSeasonFrom(age, birthdayDay).finalSeason;
+
+    // calcula season destino consoante jogos restantes
+    function targetSeason(req) {
+        const missing = Math.max(0, req - games);
+        const seasonsNeeded = Math.ceil(missing / 50);
+        return currentSeason + seasonsNeeded;
+    }
+
+    function label(req) {
+        const season = targetSeason(req);
+
+        if (season > retireSeason) return "❌";
+
+        const futureAge = age + (season - currentSeason);
+
+        // SE ainda não atingido → mostra season + idade
+        if (games < req) return `S${season} (${futureAge}yo)`;
+
+        // SE já atingido → ✔
+        return "✔";
+    }
+
+    smallSeason.textContent = label(smallReq);
+    bigSeason.textContent   = label(bigReq);
+    goldSeason.textContent  = label(goldReq);
+    platSeason.textContent  = label(platReq);
+
+    // cores ✔ e ❌
+    [smallSeason, bigSeason, goldSeason, platSeason].forEach((el, i) => {
+        const req = [smallReq, bigReq, goldReq, platReq][i];
+
+        if (games >= req) {
+            el.style.color = "#76ff76"; // verde ✔
+        } else if (el.textContent === "❌") {
+            el.style.color = ""; // normal
+        } else {
+            el.style.color = ""; // normal season + idade
+        }
+    });
+}
+
+window.addEventListener("load", () => {
+  const v = document.getElementById("app-version");
+  const u = document.getElementById("app-updates");
+
+  if (!v || !u) {
+    console.error("VERSION ELEMENTS NOT FOUND");
+    return;
+  }
+
+  v.textContent = "v3.3.13 - 19:34 - December.13.2025";
+
+  u.innerHTML = `
+  
+    <li>Loyal button moved</li>
+    <li>Skill bars visual updates</li>
+    <li>Tooltip Total Skills correction</li>
+    <li>Updates menu</li>
+    <li>Add Missing Limites to tryout copy>past
+    `;
+});
+
+
+
+// backup of the initial skills to allow LOAD (empty) to fully restore initial state
 let skills = [
   { name: "Aim", value: 92, max: 94 },
   { name: "Handling", value: 90, max: 91 },
@@ -24,8 +110,8 @@ let skills = [
   { name: "Movement", value: 56, max: 94 }
 ];
 
-// backup of the initial skills to allow LOAD (empty) to fully restore initial state
 const initialSkillsBackup = JSON.parse(JSON.stringify(skills));
+
 
 // backup do último LOAD
 let loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
@@ -47,9 +133,10 @@ const SEASON_LENGTH = 35;
 let heartState = 0;
 let moraleState = 0;
 let maxMode = false;
-
+let fraggerActive = false;
 const heartBoosts = { 0: 0, 1: 1, 2: 3, 3: 5, 4: 8 };
 const moraleBoosts = { 0: 0, 1: 1, 2: 2, 3: 3 };
+
 
 const equipped = { mousepad: null, mouse: null, keyboard: null, headset: null };
 let equipmentBoosts = {};
@@ -87,8 +174,11 @@ setInterval(updateGameDay, 60000);
 function computeSkillValues(s) {
   const equipBoost = equipmentBoosts[s.name] || 0;
   const base = maxMode ? s.max : s.value;
-  const pct = (heartBoosts[heartState] + moraleBoosts[moraleState]) / 100;
-  const pctBoost = base * pct;
+let pctTotal = heartBoosts[heartState] + moraleBoosts[moraleState];
+
+
+
+const pct = pctTotal / 100;  const pctBoost = base * pct;
   const afterPercent = base + pctBoost;
   const final = afterPercent + equipBoost;
   return { base, equipBoost, pctBoost, afterPercent, final };
@@ -283,6 +373,19 @@ function renderSkills() {
     name.textContent = s.name;
     name.style.color = finalVal >= 100 ? "#f7f8c9" : "#ffffff";
 
+    // LIMIT REACHED (value == max, mas não 100)
+if (s.value === s.max && s.max < 100 && finalVal < 100) {
+    name.style.color = "#f7f8c9"; // verde premium
+}
+    // ===============================
+// LIMIT REACHED (value === max, mas < 100)
+// ===============================
+if (s.value === s.max && s.max < 100) {
+    name.classList.add("limit-reached");
+} else {
+    name.classList.remove("limit-reached");
+}
+
     const bar = document.createElement("div");
     bar.className = "skill-bar";
 
@@ -323,6 +426,7 @@ if (boostW > 0) {
   boostF.style.left = baseW + "%";
   boostF.style.width = boostW + "%";
   boostF.style.zIndex = 2;
+  
   
 
   // Se final >= 100 → dourado + brilho + canto redondo
@@ -377,6 +481,10 @@ if (finalVal >= 100) {
     cur.className = "skill-current";
     cur.textContent = maxMode ? s.max : Math.round(v.base);
     if (finalVal >= 100) cur.style.color = "#ee6b0e";
+    // LIMIT REACHED (value == max, mas não 100)
+    if (s.value === s.max && s.max < 100 && finalVal < 100) {
+        cur.style.color = "#ee6b0e";
+    }
 
     const mx = document.createElement("span");
     mx.className = "skill-max";
@@ -560,6 +668,83 @@ function showTooltipForSkill(s, e) {
     const el = document.getElementById(id);
     if (el) el.textContent = val;
   };
+const totalSkillBox = document.querySelector(".total-skill-box");
+
+if (totalSkillBox && tooltip) {
+
+    totalSkillBox.addEventListener("mouseenter", (e) => {
+        showTotalSkillTooltip(e);
+    });
+
+    totalSkillBox.addEventListener("mousemove", (e) => {
+        tooltip.style.left = e.pageX + 15 + "px";
+        tooltip.style.top  = e.pageY + 15 + "px";
+    });
+
+    totalSkillBox.addEventListener("mouseleave", () => {
+        hideTooltip();
+    });
+}
+function showTotalSkillTooltip(e) {
+
+    if (!tooltip) return;
+
+    /* =========================
+       TÍTULO
+    ========================= */
+    document.getElementById("tooltip-skill-name").textContent = "TOTAL SKILL";
+
+    /* =========================
+       BASE e LIMIT
+    ========================= */
+    let baseTotal  = 0;
+    let limitTotal = 0;
+
+    skills.forEach(s => {
+        baseTotal  += maxMode ? s.max : s.value;
+        limitTotal += s.max;
+    });
+
+    /* =========================
+       BOOSTS
+    ========================= */
+    let gearBoostTotal = 0;
+    let percentBoostTotal = 0;
+
+    skills.forEach(s => {
+        const v = computeSkillValues(s);
+
+        // boost absoluto (gear)
+        gearBoostTotal += v.equipBoost || 0;
+
+        // boost percentual convertido em valor real
+        percentBoostTotal += v.pctBoost || 0;
+    });
+
+    const boostTotal = percentBoostTotal + gearBoostTotal;
+    const totalFinal = baseTotal + boostTotal;
+
+    /* =========================
+       PREENCHER TOOLTIP
+    ========================= */
+    document.getElementById("tooltip-base").textContent  = baseTotal.toFixed(0);
+    document.getElementById("tooltip-boost").textContent = boostTotal.toFixed(2);
+    document.getElementById("tooltip-limit").textContent = limitTotal;
+    document.getElementById("tooltip-total").textContent = totalFinal.toFixed(2);
+
+    document.getElementById("tooltip-heart").textContent  = `+${heartBoosts[heartState]}%`;
+    document.getElementById("tooltip-morale").textContent = `+${moraleBoosts[moraleState]}%`;
+    document.getElementById("tooltip-gear").textContent   = `+${gearBoostTotal}`;
+
+    /* =========================
+       POSIÇÃO + VISIBILIDADE
+    ========================= */
+    tooltip.style.left = e.pageX + 15 + "px";
+    tooltip.style.top  = e.pageY + 15 + "px";
+
+    tooltip.classList.add("visible");
+    tooltip.classList.remove("hidden");
+}
 
   set("tooltip-skill-name", s.name);
   set("tooltip-base", Math.round(v.base));
@@ -888,7 +1073,7 @@ function openMissingSkillPopup(list) {
         `;
         container.appendChild(div);
     });
-
+document.getElementById("modal-overlay").classList.remove("hidden");
     popup.classList.remove("hidden");
 
     document.getElementById("missing-skill-confirm").onclick = () => {
@@ -911,7 +1096,7 @@ function openMissingSkillPopup(list) {
 
     // FECHAR POPUP
     popup.classList.add("hidden");
-
+document.getElementById("modal-overlay").classList.add("hidden");
     // 👇 AQUI ESTÁ A NOVA PARTE
     // COMPLETAR LOAD COMO SE NÃO TIVESSE HAVIDO MISSING SKILLS
 
@@ -1343,12 +1528,32 @@ function computeMaxCareerHeart() {
   maxLine.innerHTML = `MAX HEART POSSIBLE: ${icon} (${finalSeason})`;
 }
 
+window.addEventListener("load", () => {
+  const versionEl = document.getElementById("app-version");
+  const updatesEl = document.getElementById("app-updates");
 
+  if (!versionEl || !updatesEl) {
+    console.error("VERSION DOM NOT FOUND");
+    return;
+  }
+
+  versionEl.textContent = APP_VERSION;
+
+  updatesEl.innerHTML = "";
+  APP_UPDATES.forEach(u => {
+    const li = document.createElement("li");
+    li.textContent = u;
+    updatesEl.appendChild(li);
+  });
+});
 /* ---------------- INIT ---------------- */
-renderAllEquipmentUI();
-recomputeEquipmentBoosts();
-updateGearButtonState();
-renderSkills();
-updateHeartsBasedOnGames(0);
-computeMaxCareerHeart();
-updateGamesButtonState();
+document.addEventListener("DOMContentLoaded", () => {
+  renderAllEquipmentUI();
+  recomputeEquipmentBoosts();
+  updateGearButtonState();
+  renderSkills();
+  updateHeartsBasedOnGames(0);
+  computeMaxCareerHeart();
+  updateGamesButtonState();
+});
+

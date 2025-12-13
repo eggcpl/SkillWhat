@@ -28,6 +28,7 @@
         <div class="game-info-box">
             <span id="real-clock">00:00:00</span>
             <span id="game-day">S1 - 1/35</span>
+            
         </div>
 
         <!-- TOP BUTTONS -->
@@ -38,6 +39,8 @@
             <button class="action-btn max-btn"></button>
             <button class="action-btn gear-btn"></button>
             <button class="action-btn games-btn"></button>
+            <button id="game-img-btn" class="game-img-btn"></button>
+            
         </div>
 
         <!-- SKILLS -->
@@ -51,7 +54,17 @@
                     <span id="total-skill-current" class="value">0</span>
                     <span id="total-skill-max" class="max">/0</span>
                 </div>
+                <div id="modal-overlay" class="modal-overlay hidden"></div>
+<div id="modal-overlay" class="modal-overlay hidden"></div>
+<div id="missing-skill-popup" class="missing-popup hidden">
+  <div class="missing-popup-inner">
+    <h3>Missing Limits</h3>
+    <div id="missing-skill-fields"></div>
+    <button id="missing-skill-confirm">OK</button>
+  </div>
+</div>
             </div>
+            
 <div id="missing-skill-popup" class="missing-popup hidden">
   <div class="missing-popup-inner">
     <h3>Missing Limits</h3>
@@ -152,7 +165,6 @@
             <button id="game-lock-btn" class="gear-lock-top">🔓</button>
 
             <div class="game-content">
-                <button id="game-img-btn" class="game-img-btn"></button>
 
                 <div class="game-row">
                     <span class="game-label">GAMES:</span>
@@ -200,7 +212,10 @@
 
         </div>
     </div>
-
+<div class="version-box">
+  <div id="app-version"></div>
+  <ul id="app-updates"></ul>
+</div>
     <script src="main.js"></script>
 
 </body>
