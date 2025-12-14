@@ -1,3 +1,13 @@
+const APP_VERSION = "v3.3.13 - 19:34 - December.13.2025";
+
+const APP_UPDATES = [
+  "Loyal button moved",
+  "Skill bars visual updates",
+  "Tooltip Total Skills correction",
+  "Updates menu",
+  "Add Missing Limits to tryout copy > paste"
+];
+
 // ===== FORCE VERSION RENDER (ISOLATED) =====
 
 // ===== END FORCE VERSION =====
@@ -7,95 +17,8 @@ const ICON_BIG_HTML   = '❤️';
 const ICON_GOLD_HTML  = '💛';
 const ICON_PLAT_HTML  = '💙';
 
-function updateHeartsBasedOnGames(games) {
-    const smallSeason = document.querySelector(".season-small");
-    const bigSeason   = document.querySelector(".season-big");
-    const goldSeason  = document.querySelector(".season-gold");
-    const platSeason  = document.querySelector(".season-plat");
 
-    if (!smallSeason || !bigSeason || !goldSeason || !platSeason) return;
-
-    const loyal = document.getElementById("loyal-status").textContent === "YES";
-
-    let smallReq = 100, bigReq = 200, goldReq = 400, platReq = 800;
-
-    if (loyal) {
-        smallReq = Math.floor(smallReq * 0.75);
-        bigReq   = Math.floor(bigReq * 0.75);
-        goldReq  = Math.floor(goldReq * 0.75);
-        platReq  = Math.floor(platReq * 0.75);
-    }
-
-    const ageText = document.querySelector(".player-age")?.textContent || "";
-    const { age, birthdayDay } = parseAgeString(ageText);
-
-    const gd = calculateGameDate();
-    const currentSeason = gd.season;
-
-    // calcular season de reforma
-    const retireSeason = computeRetireSeasonFrom(age, birthdayDay).finalSeason;
-
-    // calcula season destino consoante jogos restantes
-    function targetSeason(req) {
-        const missing = Math.max(0, req - games);
-        const seasonsNeeded = Math.ceil(missing / 50);
-        return currentSeason + seasonsNeeded;
-    }
-
-    function label(req) {
-        const season = targetSeason(req);
-
-        if (season > retireSeason) return "❌";
-
-        const futureAge = age + (season - currentSeason);
-
-        // SE ainda não atingido → mostra season + idade
-        if (games < req) return `S${season} (${futureAge}yo)`;
-
-        // SE já atingido → ✔
-        return "✔";
-    }
-
-    smallSeason.textContent = label(smallReq);
-    bigSeason.textContent   = label(bigReq);
-    goldSeason.textContent  = label(goldReq);
-    platSeason.textContent  = label(platReq);
-
-    // cores ✔ e ❌
-    [smallSeason, bigSeason, goldSeason, platSeason].forEach((el, i) => {
-        const req = [smallReq, bigReq, goldReq, platReq][i];
-
-        if (games >= req) {
-            el.style.color = "#76ff76"; // verde ✔
-        } else if (el.textContent === "❌") {
-            el.style.color = ""; // normal
-        } else {
-            el.style.color = ""; // normal season + idade
-        }
-    });
-}
-
-window.addEventListener("load", () => {
-  const v = document.getElementById("app-version");
-  const u = document.getElementById("app-updates");
-
-  if (!v || !u) {
-    console.error("VERSION ELEMENTS NOT FOUND");
-    return;
-  }
-
-  v.textContent = "v3.3.13 - 19:34 - December.13.2025";
-
-  u.innerHTML = `
-  
-    <li>Loyal button moved</li>
-    <li>Skill bars visual updates</li>
-    <li>Tooltip Total Skills correction</li>
-    <li>Updates menu</li>
-    <li>Add Missing Limites to tryout copy>past
-    `;
-});
-
+let missingPopupOpen = false;
 
 
 // backup of the initial skills to allow LOAD (empty) to fully restore initial state
@@ -205,10 +128,6 @@ function updateTotals() {
 
 
 
-function positionInfoTooltip(e) {
-    infoTooltip.style.left = (e.pageX - 100) + "px";
-    infoTooltip.style.top = (e.pageY + 15) + "px";
-}
 
 
 
@@ -258,7 +177,11 @@ function positionInfoTooltip(e) {
 
             // extrai apenas número ou ?
             let rawMax = maxLine.replace("/", "").trim();
-            const max = rawMax === "?" ? null : (parseInt(rawMax, 10) || 0);
+            let max = null;
+
+            if (/^\d+$/.test(rawMax)) {
+                max = parseInt(rawMax, 10);
+            }
 
             parsed.push({ name, value, max });
         }
@@ -358,7 +281,8 @@ function renderSkills() {
 
     // LIMIT REACHED (value == max, mas não 100)
 if (s.value === s.max && s.max < 100 && finalVal < 100) {
-    name.style.color = "#f7f8c9"; // verde premium
+    name.style.color = "#ffffffff"; // verde premium
+    
 }
     // ===============================
 // LIMIT REACHED (value === max, mas < 100)
@@ -466,7 +390,7 @@ if (finalVal >= 100) {
     if (finalVal >= 100) cur.style.color = "#ee6b0e";
     // LIMIT REACHED (value == max, mas não 100)
     if (s.value === s.max && s.max < 100 && finalVal < 100) {
-        cur.style.color = "#ee6b0e";
+        cur.style.color = "#ffffffff";
     }
 
     const mx = document.createElement("span");
@@ -809,6 +733,7 @@ if (loadBtn) {
 
     // CHECK IF LOAD INPUT IS EMPTY -> RESTORE INITIAL STATE (option A)
     const loadText = document.getElementById("skill-input").value.trim();
+    missingPopupOpen = false;
     if (loadText.length === 0) {
 
         // restore name + age defaults (initial view)
@@ -844,16 +769,18 @@ loadedAge = "19yo (day 5)";
     if (ageEl)  ageEl.textContent  = data.playerAge;
 
     if (data.skills.length) {
-      // if parsed skills are present, replace skills
-      skills = data.skills;
-    }
+        skills = data.skills;
+    } 
+
 
     // detectar skills com max = null
 const incomplete = skills.filter(s => s.max === null);
-if (incomplete.length > 0) {
+
+if (incomplete.length > 0 && !missingPopupOpen) {
     openMissingSkillPopup(incomplete);
-    return; // evita continuar o LOAD até preencher
+    return;
 }
+
 loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
 loadedName = data.playerName;
 loadedAge = data.playerAge;
@@ -1042,6 +969,8 @@ function updateGamesButtonState() {
   }
 }
 function openMissingSkillPopup(list) {
+  if (missingPopupOpen) return; // ⛔ impede abrir de novo
+    missingPopupOpen = true;      // 🔒 marca como aberto
     const popup = document.getElementById("missing-skill-popup");
     const container = document.getElementById("missing-skill-fields");
 
@@ -1050,54 +979,109 @@ function openMissingSkillPopup(list) {
     list.forEach(s => {
         const div = document.createElement("div");
         div.className = "missing-row";
+
         div.innerHTML = `
             <span>${s.name}</span>
-            <input type="number" min="1" max="100" id="miss-${s.name}" placeholder="limit">
+            <input
+                type="text"
+                class="missing-input"
+                inputmode="numeric"
+                id="miss-${s.name}"
+                placeholder="70–100"
+            >
         `;
+
         container.appendChild(div);
     });
-document.getElementById("modal-overlay").classList.remove("hidden");
+
+    document.getElementById("modal-overlay").classList.remove("hidden");
     popup.classList.remove("hidden");
 
-    document.getElementById("missing-skill-confirm").onclick = () => {
-    let allGood = true;
+    // ===== INPUT AUTO-VALIDATION (70–100) =====
+    const inputs = [...document.querySelectorAll('.missing-input')];
 
-    list.forEach(s => {
-        const field = document.getElementById(`miss-${s.name}`);
-        const val = parseInt(field.value, 10);
+    inputs.forEach((input, index) => {
 
-        if (!val || val < 1 || val > 100) {
-            allGood = false;
-            field.style.border = "1px solid red";
-        } else {
-            field.style.border = "";
-            s.max = val;
-        }
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '');
+            const value = input.value;
+
+            // máximo 3 dígitos
+            if (value.length > 3) {
+                input.value = '';
+                return;
+            }
+
+            // standby 10
+            if (value === '10') return;
+
+            // 3 dígitos
+            if (value.length === 3) {
+                if (value === '100') {
+                    inputs[index + 1]?.focus();
+                    return;
+                }
+                input.value = '';
+                return;
+            }
+
+            // 2 dígitos
+            if (value.length === 2) {
+                const num = Number(value);
+
+                if (num >= 70 && num <= 99) {
+                    inputs[index + 1]?.focus();
+                    return;
+                }
+
+                input.value = '';
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && input.value === '') {
+                inputs[index - 1]?.focus();
+            }
+        });
+
     });
 
-    if (!allGood) return;
+    document.getElementById("missing-skill-confirm").onclick = () => {
+        let allGood = true;
 
-    // FECHAR POPUP
-    popup.classList.add("hidden");
-document.getElementById("modal-overlay").classList.add("hidden");
-    // 👇 AQUI ESTÁ A NOVA PARTE
-    // COMPLETAR LOAD COMO SE NÃO TIVESSE HAVIDO MISSING SKILLS
+        list.forEach(s => {
+            const field = document.getElementById(`miss-${s.name}`);
+            const val = parseInt(field.value, 10);
 
-    loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
-    loadedName = document.querySelector(".player-name").textContent;
-    loadedAge  = document.querySelector(".player-age").textContent;
+            if (!(val >= 70 && val <= 100)) {
+                allGood = false;
+                field.style.border = "1px solid red";
+            } else {
+                field.style.border = "";
+                s.max = val;
+                s.max = Number(val); // força número, nunca null
+            }
+        });
 
-    // REFRESH UI
-    recomputeEquipmentBoosts();
-    renderAllEquipmentUI();
-    updateGearButtonState();
-    renderSkills();
-    computeMaxCareerHeart();
-    updateGamesButtonState();
-    updateRetireDisplayIfNeeded();
-};
+        if (!allGood) return;
 
+        popup.classList.add("hidden");
+        document.getElementById("modal-overlay").classList.add("hidden");
+missingPopupOpen = false; // 🔓 permite novo popup num próximo LOAD
+        loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
+        loadedName = document.querySelector(".player-name").textContent;
+        loadedAge  = document.querySelector(".player-age").textContent;
+
+        recomputeEquipmentBoosts();
+        renderAllEquipmentUI();
+        updateGearButtonState();
+        renderSkills();
+        computeMaxCareerHeart();
+        updateGamesButtonState();
+        updateRetireDisplayIfNeeded();
+    };
 }
+
 
 
 /* ---------------- POPUP (open / apply / drag / lock / outside click) ---------------- */
@@ -1228,6 +1212,7 @@ document.addEventListener("mousedown", (e) => {
 
 /* ---------------- RUBBER RESET ---------------- */
 const rubber = document.querySelector(".rubber-btn");
+missingPopupOpen = false;
 if (rubber) {
   rubber.addEventListener("click", () => {
 
@@ -1299,60 +1284,6 @@ if (ageEl)  ageEl.textContent  = loadedAge;
     updateRetireDisplayIfNeeded();
   });
 }
-
-
-/* --- DOM READY: setup loyal + games input listeners --- */
-document.addEventListener('DOMContentLoaded', () => {
-  const gameImgBtn = document.getElementById('game-img-btn');
-  const loyalStatusEl = document.getElementById('loyal-status');
-
-  if (!gameImgBtn) console.warn('game-img-btn not found in DOM');
-  else {
-    gameImgBtn.classList.remove('active');
-    if (loyalStatusEl) loyalStatusEl.textContent = 'NO';
-
-    let originalGamesBeforeLoyal = null;
-
-gameImgBtn.addEventListener('click', () => {
-    const isOn = gameImgBtn.classList.toggle('active');
-    const loyalStatusEl = document.getElementById("loyal-status");
-    const gamesPlayedEl = document.getElementById("games-played");
-
-    if (loyalStatusEl) loyalStatusEl.textContent = isOn ? 'YES' : 'NO';
-
-    let games = parseInt(gamesPlayedEl.textContent, 10) || 0;
-
-    if (isOn) {
-        // guardar valor real antes do desconto
-        originalGamesBeforeLoyal = games;
-
-        // aplicar desconto 25%
-        const reduced = Math.floor(games * 0.75);
-        gamesPlayedEl.textContent = reduced;
-
-        updateHeartsBasedOnGames(reduced);
-    } else {
-        // restaurar valor original
-        if (originalGamesBeforeLoyal !== null) {
-            gamesPlayedEl.textContent = originalGamesBeforeLoyal;
-            updateHeartsBasedOnGames(originalGamesBeforeLoyal);
-        }
-    }
-
-    computeMaxCareerHeart();
-    updateGamesButtonState();
-});
-
-  }
-
-  const gameInput = document.getElementById("game-input");
-  const gameOkBtn = document.getElementById("game-ok");
-  const gamesPlayedEl = document.getElementById("games-played");
-  const smallSeason = document.querySelector(".season-small");
-  const bigSeason   = document.querySelector(".season-big");
-  const goldSeason  = document.querySelector(".season-gold");
-  const platSeason  = document.querySelector(".season-plat");
-
 function updateHeartsBasedOnGames(games) {
     const smallSeason = document.querySelector(".season-small");
     const bigSeason   = document.querySelector(".season-big");
@@ -1420,6 +1351,60 @@ function updateHeartsBasedOnGames(games) {
         }
     });
 }
+
+/* --- DOM READY: setup loyal + games input listeners --- */
+document.addEventListener('DOMContentLoaded', () => {
+  const gameImgBtn = document.getElementById('game-img-btn');
+  const loyalStatusEl = document.getElementById('loyal-status');
+
+  if (!gameImgBtn) console.warn('game-img-btn not found in DOM');
+  else {
+    gameImgBtn.classList.remove('active');
+    if (loyalStatusEl) loyalStatusEl.textContent = 'NO';
+
+    let originalGamesBeforeLoyal = null;
+
+gameImgBtn.addEventListener('click', () => {
+    const isOn = gameImgBtn.classList.toggle('active');
+    const loyalStatusEl = document.getElementById("loyal-status");
+    const gamesPlayedEl = document.getElementById("games-played");
+
+    if (loyalStatusEl) loyalStatusEl.textContent = isOn ? 'YES' : 'NO';
+
+    let games = parseInt(gamesPlayedEl.textContent, 10) || 0;
+
+    if (isOn) {
+        // guardar valor real antes do desconto
+        originalGamesBeforeLoyal = games;
+
+        // aplicar desconto 25%
+        const reduced = Math.floor(games * 0.75);
+        gamesPlayedEl.textContent = reduced;
+
+        updateHeartsBasedOnGames(reduced);
+    } else {
+        // restaurar valor original
+        if (originalGamesBeforeLoyal !== null) {
+            gamesPlayedEl.textContent = originalGamesBeforeLoyal;
+            updateHeartsBasedOnGames(originalGamesBeforeLoyal);
+        }
+    }
+
+    computeMaxCareerHeart();
+    updateGamesButtonState();
+});
+
+  }
+
+  const gameInput = document.getElementById("game-input");
+  const gameOkBtn = document.getElementById("game-ok");
+  const gamesPlayedEl = document.getElementById("games-played");
+  const smallSeason = document.querySelector(".season-small");
+  const bigSeason   = document.querySelector(".season-big");
+  const goldSeason  = document.querySelector(".season-gold");
+  const platSeason  = document.querySelector(".season-plat");
+
+
 
 
 
@@ -1529,25 +1514,31 @@ if (infoWrapper && infoTooltip && overlay) {
 
 }
 
-window.addEventListener("load", () => {
-  const versionEl = document.getElementById("app-version");
-  const updatesEl = document.getElementById("app-updates");
 
-  if (!versionEl || !updatesEl) {
-    console.error("VERSION DOM NOT FOUND");
+
+window.addEventListener("load", () => {
+  const v = document.getElementById("app-version");
+  const u = document.getElementById("app-updates");
+
+  if (!v || !u) {
+    console.error("VERSION ELEMENTS NOT FOUND");
     return;
   }
 
-  versionEl.textContent = APP_VERSION;
+  v.textContent = "v3.3.14 - 4:07 - December.13.2025";
 
-  updatesEl.innerHTML = "";
-  APP_UPDATES.forEach(u => {
-    const li = document.createElement("li");
-    li.textContent = u;
-    updatesEl.appendChild(li);
-  });
-  
+  u.innerHTML = `
+    <li>Fixed Missing Limits flow for players loaded with unknown limits
+    <li>Loyal button moved
+    <li>Skill bars visual updates</li>
+    <li>Tooltip Total Skills correction
+    <li>Updates menu</li>
+    <li>Add Missing Limites to tryout copy>past
+    `;
 });
+
+
+
 /* ---------------- INIT ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
   renderAllEquipmentUI();
