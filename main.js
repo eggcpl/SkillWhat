@@ -13,14 +13,14 @@ let missingPopupOpen = false;
 
 // backup of the initial skills to allow LOAD (empty) to fully restore initial state
 let skills = [
-  { name: "Aim", value: 92, max: 94 },
-  { name: "Handling", value: 90, max: 91 },
-  { name: "Quickness", value: 73, max: 93 },
-  { name: "Determination", value: 93, max: 93 },
-  { name: "Awareness", value: 60, max: 94 },
-  { name: "Teamplay", value: 15, max: 95 },
-  { name: "Gamesense", value: 10, max: 95 },
-  { name: "Movement", value: 56, max: 94 }
+  { name: "Aim", value: 100, max: 100 },
+  { name: "Handling", value: 100, max: 100 },
+  { name: "Quickness", value: 100, max: 100 },
+  { name: "Determination", value: 100, max: 100 },
+  { name: "Awareness", value: 100, max: 100 },
+  { name: "Teamplay", value: 100, max: 100 },
+  { name: "Gamesense", value: 100, max: 100 },
+  { name: "Movement", value: 100, max: 100 }
 ];
 
 const initialSkillsBackup = JSON.parse(JSON.stringify(skills));
