@@ -95,7 +95,7 @@ body {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 3px; /* menos espaço */  }
+  gap: 4px; /* menos espaço */  }
 
 .skill-row {
     display: flex;
@@ -183,6 +183,7 @@ body {
     text-align: center;
     margin-top: -2px;
 }
+
 
 .skill-current {
     font-weight: 600;
@@ -964,16 +965,6 @@ filter: brightness(1.2);
 }
 
 /* ===== GLOBAL SKILL EDIT COLUMN ===== */
-.global-edit-col {
-    position: flex;
-    right: 26px;        /* ajusta para alinhar com as tuas rows */
-    top: 215px;         /* 🔥 este valor controla a altura da coluna */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    z-index: 20;
-}
 
 .global-mode-btn {
     width: 32px;
@@ -985,6 +976,7 @@ filter: brightness(1.2);
     font-weight: 700;
     cursor: pointer;
     margin-bottom: 6px;
+    gap: 10px;   /* 🔥 ESPAÇAMENTO ENTRE CADA BARRA */
 }
 
 .global-edit-row {
@@ -1003,6 +995,7 @@ filter: brightness(1.2);
     font-weight: 700;
     cursor: pointer;
     transition: 0.1s;
+    
 }
 
 .global-edit-btn:hover {
@@ -1012,12 +1005,12 @@ filter: brightness(1.2);
 /* COLUNA GLOBAL */
 .skill-edit-column {
     position: absolute;
-    right: 210px;
-    top: 224px;
+    right: 140px;
+    top: 222px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 1px;
     z-index: 50;
 
 }
@@ -1026,14 +1019,16 @@ filter: brightness(1.2);
 .edit-row {
     display: flex;
     gap: 6px;              /* espaço entre - e + */
-    height: 21.5px;          /* igual à altura aproximada da skill row */
-    margin-bottom: px;    /* escolhe 6–10px conforme o gosto */
+    height: 22px;          /* igual à altura aproximada da skill row */
+    margin-bottom: 5px;    /* escolhe 6–10px conforme o gosto */
     align-items: center;
 }
 
+
+
 .mode-toggle {
     position: absolute;
-    right: -0,5px;
+    right: 83px;
     top: -34px;
     height: 35px;                 /* controla apenas a altura */
     aspect-ratio: 1 / 1;        /* proporção do botão S/L real */
@@ -1051,17 +1046,13 @@ filter: brightness(1.2);
     cursor: pointer;
 }
 
-.edit-row {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 4px;
-}
 
 .edit-btn-img {
     width: 15px;
     height: 15px;
     cursor: pointer;
     user-select: none;
+    display: block;
 }
 
 
@@ -1117,19 +1108,7 @@ filter: brightness(1.2);
     margin-bottom: 10px;
 }
 
-/* Tooltip da imagem */
-.info-tooltip {
-    position: absolute;
-    padding: 0;
-    background: none;
-    border-radius: 10px;
-    z-index: 9999;
-    pointer-events: none;
-    border: 2px solid #8e8e8e;
-    width: 800px;      /* 👈 define o tamanho DO TOOLTIP */
-    height: auto;      /* ou define altura fixa se quiseres */
-    z-index: 9999; /* 👈 MAIS ALTO QUE O OVERLAY */
-}
+
 
 .info-tooltip img {
 
@@ -1188,18 +1167,6 @@ filter: brightness(1.2);
   position: relative;
 }
 
-.info-tooltip {
-    position: fixed;          /* 🔥 FIXO no ecrã */
-    top: 90px;                /* 👈 sobe/desce */
-    left: 40px;               /* 👈 MAIS À ESQUERDA */
-    width: 800px;             /* 👈 TAMANHO REAL */
-    background: none;
-    padding: 0;
-    border-radius: 10px;
-    border: 2px solid #8e8e8e;
-    z-index: 9999;
-    pointer-events: auto;
-}
 .info-wrapper {
     position: relative;
     display: inline-block;
@@ -1377,9 +1344,10 @@ player-header,
   scale: 70%;
   position: absolute;
   top: 164px;
-  right: 1050px;
+  right: 435px;
   z-index: 200;
-
+  pointer-events: none;
+  z-index: 200;
 }
 
 /* CÉLULA */
@@ -1398,4 +1366,43 @@ player-header,
   width: 5px;
   height: 5px;
   background: #ff7a00;
+}
+/* container da barra extra */
+.skill-boost-wrap {
+  width: 70px;
+  height: 5px;
+  margin-left: 7px;
+  margin-top: 0px;   /* 👈 ESPAÇAMENTO VERTICAL ENTRE BARRAS */
+
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+
+/* preenchimento */
+.skill-boost-fill {
+  height: 100%;
+  width: 0%;
+
+  background: #4caf50; /* verde elegante */
+  border-radius: 999px;
+}
+
+.boost-tooltip {
+  position: fixed;
+  padding: 4px 8px;
+  background: #1f1f1f;
+  color: #f5f4dd;
+  border: 1px solid #666;
+  border-radius: 6px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  pointer-events: none;
+  z-index: 9999;
+
+  opacity: 0;
+  transition: opacity 0.1s ease;
 }

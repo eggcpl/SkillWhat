@@ -28,8 +28,8 @@ const initialSkillsBackup = JSON.parse(JSON.stringify(skills));
 
 // backup do último LOAD
 let loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
-let loadedName = "Legend";
-let loadedAge = "19yo (day 5)";
+let loadedName = "Spidevil";
+let loadedAge = "15yo (day 1)";
 
 const skillsList = document.getElementById("skills-list");
 const totalCurrent = document.getElementById("total-skill-current");
@@ -94,7 +94,20 @@ function renderMiniGear() {
   const DOT = 6;
 
   // desenha grelha 4x4
-  for (let row = 0; row < 4; row++) {
+  const OUTER_W = 4 * CELL + 3 * GAP;
+const OUTER_H = 4 * CELL + 3 * GAP;
+
+const outer = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+outer.setAttribute("x", 0);
+outer.setAttribute("y", 0);
+outer.setAttribute("width", OUTER_W);
+outer.setAttribute("height", OUTER_H);
+outer.setAttribute("fill", "none");
+outer.setAttribute("stroke", "rgba(255,255,255,0.25)");
+outer.setAttribute("stroke-width", "2");
+
+svg.appendChild(outer);
+for (let row = 0; row < 4; row++) {
     for (let col = 0; col < 4; col++) {
       const x = col * (CELL + GAP);
       const y = row * (CELL + GAP);
@@ -105,7 +118,7 @@ function renderMiniGear() {
       rect.setAttribute("width", CELL);
       rect.setAttribute("height", CELL);
       rect.setAttribute("fill", "none");
-      rect.setAttribute("stroke", "rgba(255,255,255,0.25)");
+      rect.setAttribute("stroke", "rgba(255, 255, 255, 0.44)");
       rect.setAttribute("stroke-width", "1");
 
       svg.appendChild(rect);
@@ -459,28 +472,89 @@ if (finalVal >= 100) {
 // ===== UPDATE RIGHT COLUMN BUTTONS (ONLY IMAGE BUTTONS) =====
 if (globalButtonsContainer) {
     globalButtonsContainer.innerHTML = "";
+let boostCapAdded = false;
 
     skills.forEach((s, index) => {
+
+        const v = computeSkillValues(s);
+
+        // LINHA DA COLUNA DIREITA
         const row = document.createElement("div");
         row.className = "edit-row";
 
-        // BOTÃO MENOS
+        // BOTÃO -
         const minus = document.createElement("img");
         minus.src = "https://i.postimg.cc/qBCQ18DZ/button.png";
         minus.className = "edit-btn-img";
         minus.addEventListener("click", () => applySkillChange(index, -1));
 
-        // BOTÃO MAIS
+        // BOTÃO +
         const plus = document.createElement("img");
         plus.src = "https://i.postimg.cc/SQzVgW1v/button.png";
         plus.className = "edit-btn-img";
         plus.addEventListener("click", () => applySkillChange(index, +1));
 
+        // BARRA 100–120
+        const boostContainer = document.createElement("div");
+boostContainer.style.display = "flex";
+boostContainer.style.flexDirection = "column";
+boostContainer.style.alignItems = "center";
+
+// 👉 adiciona BOOST CAP só UMA VEZ
+if (!boostCapAdded) {
+  const label = document.createElement("div");
+  label.textContent = "BOOST CAP";
+  label.style.fontSize = "9px";
+  label.style.fontWeight = "700";
+  label.style.color = "#ede3aa";
+  label.style.marginBottom = "18px";
+  label.style.marginTop = "-32px";   // 🔥 ISTO resolve
+  label.style.opacity = "0.85";
+  label.style.whiteSpace = "nowrap";
+
+  boostContainer.appendChild(label);
+  boostCapAdded = true;
+}
+
+const boostWrap = document.createElement("div");
+boostWrap.className = "skill-boost-wrap";
+
+
+        const boostFill = document.createElement("div");
+        boostFill.className = "skill-boost-fill";
+
+        const hiddenBoost = Math.max(0, Math.min(v.final - 100, 20));
+        const pct = (hiddenBoost / 20) * 100;
+        boostFill.style.width = pct + "%";
+
+        boostWrap.appendChild(boostFill);
+const boostTooltip = document.getElementById("boost-tooltip");
+
+boostWrap.addEventListener("mouseenter", (e) => {
+  const total = Math.round(v.final); // ex: 113
+  boostTooltip.textContent = total;
+  boostTooltip.classList.add("visible");
+});
+
+boostWrap.addEventListener("mousemove", (e) => {
+  boostTooltip.style.left = e.pageX + 10 + "px";
+  boostTooltip.style.top  = e.pageY + 10 + "px";
+});
+
+boostWrap.addEventListener("mouseleave", () => {
+  boostTooltip.classList.remove("visible");
+});
+
+        // ORDEM IMPORTANTE
         row.appendChild(minus);
         row.appendChild(plus);
+        boostContainer.appendChild(boostWrap);
+row.appendChild(boostContainer);
+
         globalButtonsContainer.appendChild(row);
     });
 }
+
 
 
 
@@ -787,14 +861,14 @@ if (loadBtn) {
         // restore name + age defaults (initial view)
         const nameEl = document.querySelector(".player-name");
         const ageEl = document.querySelector(".player-age");
-        if (nameEl) nameEl.textContent = "Legend";
-        if (ageEl) ageEl.textContent  = "19yo (day 5)";
+        if (nameEl) nameEl.textContent = "Spidevil";
+        if (ageEl) ageEl.textContent  = "15yo (day 1)";
 
         // restore skills to the initial backup (deep copy)
         skills = JSON.parse(JSON.stringify(initialSkillsBackup));
 loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
-loadedName = "Legend";
-loadedAge = "19yo (day 5)";
+loadedName = "Spidevil";
+loadedAge = "15yo (day 1)";
         // recompute and refresh UI
         recomputeEquipmentBoosts();
         renderAllEquipmentUI();
@@ -1579,9 +1653,11 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.3.18 - 23:28 - December.20.2025";
+  v.textContent = "v1.3.19 - 4:31 - December.25.2025";
 
   u.innerHTML = `
+    <li>Add Boost Bar over 100 until 120</li>
+    <li>Fix Minimap Position</li>
     <li>Add Minimap gear</li>
     <li>Add PNG export button</li>
     <li>Fixed Missing Limits flow for players loaded with unknown limits</li>
@@ -1601,6 +1677,7 @@ document.addEventListener("DOMContentLoaded", () => {
   recomputeEquipmentBoosts();
   updateGearButtonState();
   renderSkills();
+   renderMiniGear();   
   updateHeartsBasedOnGames(0);
   computeMaxCareerHeart();
   updateGamesButtonState();
