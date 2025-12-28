@@ -1399,6 +1399,20 @@ if (ageEl)  ageEl.textContent  = loadedAge;
     updateRetireDisplayIfNeeded();
   });
 }
+function updateHeartRequirementLabels(loyal) {
+  const rows = document.querySelectorAll(".heart-row");
+
+  const base = [100, 200, 400, 800];
+  const loyalVals = [75, 150, 300, 600];
+
+  rows.forEach((row, i) => {
+    const span = row.querySelector("span:nth-child(2)");
+    if (!span) return;
+
+    const value = loyal ? loyalVals[i] : base[i];
+    span.textContent = `${value} games → `;
+  });
+}
 function updateHeartsBasedOnGames(games) {
     const smallSeason = document.querySelector(".season-small");
     const bigSeason   = document.querySelector(".season-big");
@@ -1423,6 +1437,7 @@ function updateHeartsBasedOnGames(games) {
 
     const gd = calculateGameDate();
     const currentSeason = gd.season;
+
 
     // calcular season de reforma
     const retireSeason = computeRetireSeasonFrom(age, birthdayDay).finalSeason;
@@ -1480,34 +1495,34 @@ document.addEventListener('DOMContentLoaded', () => {
     let originalGamesBeforeLoyal = null;
 
 gameImgBtn.addEventListener('click', () => {
-    const isOn = gameImgBtn.classList.toggle('active');
-    const loyalStatusEl = document.getElementById("loyal-status");
-    const gamesPlayedEl = document.getElementById("games-played");
+  const isOn = gameImgBtn.classList.toggle('active');
+  const loyalStatusEl = document.getElementById("loyal-status");
+  const gamesPlayedEl = document.getElementById("games-played");
 
-    if (loyalStatusEl) loyalStatusEl.textContent = isOn ? 'YES' : 'NO';
+  if (loyalStatusEl) loyalStatusEl.textContent = isOn ? 'YES' : 'NO';
 
-    let games = parseInt(gamesPlayedEl.textContent, 10) || 0;
+  let games = parseInt(gamesPlayedEl.textContent, 10) || 0;
 
-    if (isOn) {
-        // guardar valor real antes do desconto
-        originalGamesBeforeLoyal = games;
+  if (isOn) {
+    originalGamesBeforeLoyal = games;
+    const reduced = Math.floor(games * 0.75);
+    gamesPlayedEl.textContent = reduced;
 
-        // aplicar desconto 25%
-        const reduced = Math.floor(games * 0.75);
-        gamesPlayedEl.textContent = reduced;
+    updateHeartRequirementLabels(true);   // 🔥 AQUI
+    updateHeartsBasedOnGames(reduced);
+  } else {
+    if (originalGamesBeforeLoyal !== null) {
+      gamesPlayedEl.textContent = originalGamesBeforeLoyal;
 
-        updateHeartsBasedOnGames(reduced);
-    } else {
-        // restaurar valor original
-        if (originalGamesBeforeLoyal !== null) {
-            gamesPlayedEl.textContent = originalGamesBeforeLoyal;
-            updateHeartsBasedOnGames(originalGamesBeforeLoyal);
-        }
+      updateHeartRequirementLabels(false); // 🔥 AQUI
+      updateHeartsBasedOnGames(originalGamesBeforeLoyal);
     }
+  }
 
-    computeMaxCareerHeart();
-    updateGamesButtonState();
+  computeMaxCareerHeart();
+  updateGamesButtonState();
 });
+
 
   }
 
@@ -1666,7 +1681,8 @@ document.addEventListener("DOMContentLoaded", () => {
   recomputeEquipmentBoosts();
   updateGearButtonState();
   renderSkills();
-   renderMiniGear();   
+  renderMiniGear();
+  updateHeartRequirementLabels(false); 
   updateHeartsBasedOnGames(0);
   computeMaxCareerHeart();
   updateGamesButtonState();
