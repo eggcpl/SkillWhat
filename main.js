@@ -15,7 +15,7 @@ const boostTooltip = document.getElementById("boost-tooltip");
 function showBoostTooltip(e, finalValue) {
   if (!boostTooltip) return;
 
-  const capped = Math.min(120, Math.round(finalValue));
+const capped = Math.min(120, finalValue);
 
   boostTooltip.textContent = capped;
   boostTooltip.style.left = e.pageX + 12 + "px";
@@ -717,6 +717,42 @@ if (maxMode) {
 
 /* ---------------- TOOLTIP ---------------- */
 const tooltip = document.getElementById("skill-tooltip");
+function showTotalSkillTooltip(e) {
+  if (!tooltip) return;
+
+  document.getElementById("tooltip-skill-name").textContent = "TOTAL SKILL";
+
+  let baseTotal = 0;
+  let limitTotal = 0;
+  let gearBoostTotal = 0;
+  let percentBoostTotal = 0;
+
+  skills.forEach(s => {
+    const v = computeSkillValues(s);
+    baseTotal += maxMode ? s.max : s.value;
+    limitTotal += s.max;
+    gearBoostTotal += v.equipBoost || 0;
+    percentBoostTotal += v.pctBoost || 0;
+  });
+
+  const boostTotal = percentBoostTotal + gearBoostTotal;
+  const totalFinal = baseTotal + boostTotal;
+
+  document.getElementById("tooltip-base").textContent  = baseTotal.toFixed(0);
+  document.getElementById("tooltip-boost").textContent = boostTotal.toFixed(2);
+  document.getElementById("tooltip-limit").textContent = limitTotal;
+  document.getElementById("tooltip-total").textContent = totalFinal.toFixed(2);
+
+  document.getElementById("tooltip-heart").textContent  = `+${heartBoosts[heartState]}%`;
+  document.getElementById("tooltip-morale").textContent = `+${moraleBoosts[moraleState]}%`;
+  document.getElementById("tooltip-gear").textContent   = `+${gearBoostTotal}`;
+
+  tooltip.style.left = e.pageX + 15 + "px";
+  tooltip.style.top  = e.pageY + 15 + "px";
+  tooltip.classList.add("visible");
+  tooltip.classList.remove("hidden");
+}
+
 function showTooltipForSkill(s, e) {
   const v = computeSkillValues(s);
   const set = (id, val) => {
@@ -724,66 +760,7 @@ function showTooltipForSkill(s, e) {
     if (el) el.textContent = val;
   };
 
-function showTotalSkillTooltip(e) {
 
-    if (!tooltip) return;
-
-    /* =========================
-       TÍTULO
-    ========================= */
-    document.getElementById("tooltip-skill-name").textContent = "TOTAL SKILL";
-
-    /* =========================
-       BASE e LIMIT
-    ========================= */
-    let baseTotal  = 0;
-    let limitTotal = 0;
-
-    skills.forEach(s => {
-        baseTotal  += maxMode ? s.max : s.value;
-        limitTotal += s.max;
-    });
-
-    /* =========================
-       BOOSTS
-    ========================= */
-    let gearBoostTotal = 0;
-    let percentBoostTotal = 0;
-
-    skills.forEach(s => {
-        const v = computeSkillValues(s);
-
-        // boost absoluto (gear)
-        gearBoostTotal += v.equipBoost || 0;
-
-        // boost percentual convertido em valor real
-        percentBoostTotal += v.pctBoost || 0;
-    });
-
-    const boostTotal = percentBoostTotal + gearBoostTotal;
-    const totalFinal = baseTotal + boostTotal;
-
-    /* =========================
-       PREENCHER TOOLTIP
-    ========================= */
-    document.getElementById("tooltip-base").textContent  = baseTotal.toFixed(0);
-    document.getElementById("tooltip-boost").textContent = boostTotal.toFixed(2);
-    document.getElementById("tooltip-limit").textContent = limitTotal;
-    document.getElementById("tooltip-total").textContent = totalFinal.toFixed(2);
-
-    document.getElementById("tooltip-heart").textContent  = `+${heartBoosts[heartState]}%`;
-    document.getElementById("tooltip-morale").textContent = `+${moraleBoosts[moraleState]}%`;
-    document.getElementById("tooltip-gear").textContent   = `+${gearBoostTotal}`;
-
-    /* =========================
-       POSIÇÃO + VISIBILIDADE
-    ========================= */
-    tooltip.style.left = e.pageX + 15 + "px";
-    tooltip.style.top  = e.pageY + 15 + "px";
-
-    tooltip.classList.add("visible");
-    tooltip.classList.remove("hidden");
-}
 
   set("tooltip-skill-name", s.name);
   set("tooltip-base", Math.round(v.base));
@@ -1663,9 +1640,10 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.3.19 - 4:31 - December.25.2025";
+  v.textContent = "v1.4.1 - 00:09 - December.28.2025";
 
   u.innerHTML = `
+    <li>Fixed Total Skill Tooltip & boost cap tooltip info</li>
     <li>Add Boost Bar over 100 until 120</li>
     <li>Fix Minimap Position</li>
     <li>Add Minimap gear</li>
@@ -1683,6 +1661,7 @@ window.addEventListener("load", () => {
 
 /* ---------------- INIT ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
+  
   renderAllEquipmentUI();
   recomputeEquipmentBoosts();
   updateGearButtonState();
@@ -1695,7 +1674,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const exportBtn = document.getElementById("export-card-btn");
+const totalBox = document.querySelector(".total-skill-box");
 
+  if (!totalBox) return;
+
+  totalBox.addEventListener("mouseenter", showTotalSkillTooltip);
+  totalBox.addEventListener("mousemove", showTotalSkillTooltip);
+  totalBox.addEventListener("mouseleave", hideTooltip);
   if (!exportBtn) {
     console.error("EXPORT BUTTON NOT FOUND");
     return;
