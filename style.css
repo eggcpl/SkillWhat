@@ -448,26 +448,30 @@ body {
     background-repeat: no-repeat;
 }
 
-/* Estado 1 → +1% */
+/* Estado 1 → +0.5% */
 .heart-active-1 {
-    background-image: url('https://i.postimg.cc/SRyFwh3c/1.png');
+    background-image: url('https://i.postimg.cc/ry0HDRHV/1.png');
     filter: brightness(1.2);
 }
 
-/* Estado 2 → +3% */
+/* Estado 2 → +1% */
 .heart-active-2 {
-    background-image: url('https://i.postimg.cc/Fz95248j/3.png');
+    background-image: url('https://i.postimg.cc/fWtPVSPM/2.png');
     filter: brightness(1.2);
 }
-
-/* Estado 3 → +5% */
+/* Estado 3 → +3% */
 .heart-active-3 {
+    background-image: url('https://i.postimg.cc/y6gGD3GV/3.png');
+    filter: brightness(1.2);
+}
+/* Estado 3 → +5% */
+.heart-active-4 {
     background-image: url('https://i.postimg.cc/90W5vhKP/5.png');
     filter: brightness(1.2);
 }
 
 /* Estado 4 → +8% */
-.heart-active-4 {
+.heart-active-5 {
     background-image: url('https://i.postimg.cc/PJtsBj9Q/8.png');
     filter: brightness(1.2);
 }

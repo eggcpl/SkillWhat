@@ -65,7 +65,14 @@ let heartState = 0;
 let moraleState = 0;
 let maxMode = false;
 let fraggerActive = false;
-const heartBoosts = { 0: 0, 1: 1, 2: 3, 3: 5, 4: 8 };
+const heartBoosts = {
+  0: 0,     // None
+  1: 0.5,   // Small
+  2: 1,     // Medium
+  3: 3,     // Big
+  4: 5,     // Gold
+  5: 8      // Platinum
+};
 const moraleBoosts = { 0: 0, 1: 1, 2: 2, 3: 3 };
 
 
@@ -908,7 +915,7 @@ loadedAge = data.playerAge;
 /* ---------------- HEART / MORALE / MAX ---------------- */
 if (heartBtn) {
   heartBtn.addEventListener("click", () => {
-    heartState = (heartState + 1) % 5;
+    heartState = (heartState + 1) % 6;
     heartBtn.className = "action-btn heart-grey-btn";
     if (heartState > 0) heartBtn.classList.add(`heart-active-${heartState}`);
     renderSkills();
@@ -1655,9 +1662,10 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.4.1 - 00:09 - December.28.2025";
+  v.textContent = "v1.4.2 - 01:35 - December.30.2025";
 
   u.innerHTML = `
+    <li>New Heart mechanism boost</li>
     <li>Fixed Total Skill Tooltip & boost cap tooltip info</li>
     <li>Add Boost Bar over 100 until 120</li>
     <li>Fix Minimap Position</li>
