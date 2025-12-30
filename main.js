@@ -2,6 +2,7 @@
 
 // ===== END FORCE VERSION =====
 // Icons para MAX HEART POSSIBLE
+const ICON_TINY_HTML = '<span class="heart-small3">❤️</span>';
 const ICON_SMALL_HTML = '<span class="heart-small2">❤️</span>';
 const ICON_BIG_HTML   = '❤️';
 const ICON_GOLD_HTML  = '💛';
@@ -61,6 +62,64 @@ const loadBtn = document.getElementById("load-button");
 const START_DATE = new Date(2025, 3, 28);
 const SEASON_LENGTH = 35;
 
+function whenGamesReached(currentSeason, currentDay, gamesAlready, gamesRequired) {
+  let games = gamesAlready;
+  let day = currentDay;
+  let season = currentSeason;
+
+  if (games >= gamesRequired) {
+    return { season, day };
+  }
+
+  while (true) {
+    const gamesToday = GAMES_PER_DAY[day] || 0;
+    games += gamesToday;
+
+    if (games >= gamesRequired) {
+      return { season, day };
+    }
+
+    day++;
+
+    if (day > SEASON_LENGTH) {
+      day = 1;
+      season++;
+    }
+  }
+}
+
+
+const GAMES_PER_DAY = {
+  4: 2,
+  5: 2,
+  6: 1,
+  7: 1,
+  8: 2,
+  9: 2,
+  10: 2,
+  11: 2,
+  12: 2,
+  13: 1,
+  14: 1,
+  15: 2,
+  16: 2,
+  17: 2,
+  18: 2,
+  19: 2,
+  20: 1,
+  21: 1,
+  22: 2,
+  23: 2,
+  24: 2,
+  25: 2,
+  26: 2,
+  27: 1,
+  28: 1,
+  29: 2,
+  32: 7
+};
+
+
 let heartState = 0;
 let moraleState = 0;
 let maxMode = false;
@@ -75,12 +134,28 @@ const heartBoosts = {
 };
 const moraleBoosts = { 0: 0, 1: 1, 2: 2, 3: 3 };
 
+function updateBoostLabels() {
+  const heartLabel = document.getElementById("heart-boost-label");
+  const moraleLabel = document.getElementById("morale-boost-label");
+
+  if (heartLabel) {
+    const val = heartBoosts[heartState] || 0;
+    heartLabel.textContent = `+${val}%`;
+  }
+
+  if (moraleLabel) {
+    const val = moraleBoosts[moraleState] || 0;
+    moraleLabel.textContent = `+${val}%`;
+  }
+}
+
 
 const equipped = { mousepad: null, mouse: null, keyboard: null, headset: null };
 let equipmentBoosts = {};
 
 /* ---------------- DATE & CLOCK ---------------- */
 function calculateGameDate() {
+
   const now = new Date();
   const diffMs = now - START_DATE;
   const diffDays = Math.floor(diffMs / 86400000);
@@ -805,6 +880,7 @@ if (loadBtn) {
 
     // RESET GEAR
     Object.keys(equipped).forEach(k => equipped[k] = null);
+    updateBoostLabels();
     recomputeEquipmentBoosts();
     renderAllEquipmentUI();
     updateGearButtonState();
@@ -823,19 +899,30 @@ if (loadBtn) {
     const gameInput = document.getElementById("game-input");
     const gamesPlayedEl = document.getElementById("games-played");
 
-    if (gameInput) gameInput.value = "";
+if (gameInput) gameInput.value = "0";
     if (gamesPlayedEl) gamesPlayedEl.textContent = "0";
+const gameOkBtn = document.getElementById("game-ok");
+if (gameOkBtn) {
+  setTimeout(() => gameOkBtn.click(), 0);
+}
+    // 🔥 FORÇAR ESTADO BASE DE CÁLCULO
+updateHeartsBasedOnGames(0);
+computeMaxCareerHeart();
+updateGamesButtonState();
+
 
     // RESET HEART SEASONS
-    const small = document.querySelector(".season-small");
-    const big   = document.querySelector(".season-big");
-    const gold  = document.querySelector(".season-gold");
-    const plat  = document.querySelector(".season-plat");
+const tiny  = document.querySelector(".season-tiny");
+const small = document.querySelector(".season-small");
+const big   = document.querySelector(".season-big");
+const gold  = document.querySelector(".season-gold");
+const plat  = document.querySelector(".season-plat");
 
-    if (small) { small.textContent = "S9";  small.style.color = ""; }
-    if (big)   { big.textContent   = "S11"; big.style.color   = ""; }
-    if (gold)  { gold.textContent  = "S15"; gold.style.color  = ""; }
-    if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
+if (tiny)  { tiny.textContent  = ""; tiny.style.color  = ""; }
+if (small) { small.textContent = "S9";  small.style.color = ""; }
+if (big)   { big.textContent   = "S11"; big.style.color   = ""; }
+if (gold)  { gold.textContent  = "S15"; gold.style.color  = ""; }
+if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
 
     // RESET LOYAL
     const gameImgBtn = document.getElementById("game-img-btn");
@@ -919,6 +1006,7 @@ if (heartBtn) {
     heartBtn.className = "action-btn heart-grey-btn";
     if (heartState > 0) heartBtn.classList.add(`heart-active-${heartState}`);
     renderSkills();
+    updateBoostLabels();
   });
 }
 if (moraleBtn) {
@@ -927,6 +1015,7 @@ if (moraleBtn) {
     moraleBtn.className = "action-btn morale-btn";
     if (moraleState > 0) moraleBtn.classList.add(`morale-active-${moraleState}`);
     renderSkills();
+    updateBoostLabels();
   });
 }
 if (maxBtn) {
@@ -1348,6 +1437,7 @@ if (rubber) {
 
     // RESET GEAR
     Object.keys(equipped).forEach(k => equipped[k] = null);
+    updateBoostLabels();
     recomputeEquipmentBoosts();
     renderAllEquipmentUI();
     updateGearButtonState();
@@ -1366,21 +1456,26 @@ if (rubber) {
     const gameInput = document.getElementById("game-input");
     const gamesPlayedEl = document.getElementById("games-played");
 
-    if (gameInput) gameInput.value = "";
+    if (gameInput) gameInput.value = "0";
     if (gamesPlayedEl) gamesPlayedEl.textContent = "0";
-
+const gameOkBtn = document.getElementById("game-ok");
+if (gameOkBtn) {
+  setTimeout(() => gameOkBtn.click(), 0);
+}
     updateGamesButtonState();
 
     // RESET HEART SEASONS
-    const small = document.querySelector(".season-small");
-    const big   = document.querySelector(".season-big");
-    const gold  = document.querySelector(".season-gold");
-    const plat  = document.querySelector(".season-plat");
+    const tiny  = document.querySelector(".season-tiny");
+const small = document.querySelector(".season-small");
+const big   = document.querySelector(".season-big");
+const gold  = document.querySelector(".season-gold");
+const plat  = document.querySelector(".season-plat");
 
-    if (small) { small.textContent = "S9";  small.style.color = ""; }
-    if (big)   { big.textContent   = "S11"; big.style.color   = ""; }
-    if (gold)  { gold.textContent  = "S15"; gold.style.color  = ""; }
-    if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
+if (tiny)  { tiny.textContent  = ""; tiny.style.color  = ""; }
+if (small) { small.textContent = "S9";  small.style.color = ""; }
+if (big)   { big.textContent   = "S11"; big.style.color   = ""; }
+if (gold)  { gold.textContent  = "S15"; gold.style.color  = ""; }
+if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
 
     // RESET LOYAL
     const gameImgBtn = document.getElementById("game-img-btn");
@@ -1409,8 +1504,8 @@ if (ageEl)  ageEl.textContent  = loadedAge;
 function updateHeartRequirementLabels(loyal) {
   const rows = document.querySelectorAll(".heart-row");
 
-  const base = [100, 200, 400, 800];
-  const loyalVals = [75, 150, 300, 600];
+ const base = [50, 100, 200, 400, 800];
+const loyalVals = [37, 75, 150, 300, 600];
 
   rows.forEach((row, i) => {
     const span = row.querySelector("span:nth-child(2)");
@@ -1421,73 +1516,84 @@ function updateHeartRequirementLabels(loyal) {
   });
 }
 function updateHeartsBasedOnGames(games) {
-    const smallSeason = document.querySelector(".season-small");
-    const bigSeason   = document.querySelector(".season-big");
-    const goldSeason  = document.querySelector(".season-gold");
-    const platSeason  = document.querySelector(".season-plat");
+  const tinyEl  = document.querySelector(".season-tiny");
+  const smallEl = document.querySelector(".season-small");
+  const bigEl   = document.querySelector(".season-big");
+  const goldEl  = document.querySelector(".season-gold");
+  const platEl  = document.querySelector(".season-plat");
 
-    if (!smallSeason || !bigSeason || !goldSeason || !platSeason) return;
+  if (!tinyEl || !smallEl || !bigEl || !goldEl || !platEl) return;
 
-    const loyal = document.getElementById("loyal-status").textContent === "YES";
+  const loyal = document.getElementById("loyal-status").textContent === "YES";
 
-    let smallReq = 100, bigReq = 200, goldReq = 400, platReq = 800;
+  let tinyReq  = 50;
+  let smallReq = 100;
+  let bigReq   = 200;
+  let goldReq  = 400;
+  let platReq  = 800;
 
-    if (loyal) {
-        smallReq = Math.floor(smallReq * 0.75);
-        bigReq   = Math.floor(bigReq * 0.75);
-        goldReq  = Math.floor(goldReq * 0.75);
-        platReq  = Math.floor(platReq * 0.75);
-    }
+  if (loyal) {
+    tinyReq  = Math.floor(50 * 0.75);
+    smallReq = Math.floor(100 * 0.75);
+    bigReq   = Math.floor(200 * 0.75);
+    goldReq  = Math.floor(400 * 0.75);
+    platReq  = Math.floor(800 * 0.75);
+  }
 
-    const ageText = document.querySelector(".player-age")?.textContent || "";
-    const { age, birthdayDay } = parseAgeString(ageText);
+  const ageText = document.querySelector(".player-age")?.textContent || "";
+  const { age, birthdayDay } = parseAgeString(ageText);
 
-    const gd = calculateGameDate();
-    const currentSeason = gd.season;
+  const gd = calculateGameDate();
+  const currentSeason = gd.season;
+  const retireSeason = computeRetireSeasonFrom(age, birthdayDay).finalSeason;
 
-
-    // calcular season de reforma
-    const retireSeason = computeRetireSeasonFrom(age, birthdayDay).finalSeason;
-
-    // calcula season destino consoante jogos restantes
-    function targetSeason(req) {
-        const missing = Math.max(0, req - games);
-        const seasonsNeeded = Math.ceil(missing / 55);
-        return currentSeason + seasonsNeeded;
-    }
-
-    function label(req) {
-        const season = targetSeason(req);
-
-        if (season > retireSeason) return "❌";
-
-        const futureAge = age + (season - currentSeason);
-
-        // SE ainda não atingido → mostra season + idade
-        if (games < req) return `S${season} (${futureAge}yo)`;
-
-        // SE já atingido → ✔
-        return "✔";
-    }
-
-    smallSeason.textContent = label(smallReq);
-    bigSeason.textContent   = label(bigReq);
-    goldSeason.textContent  = label(goldReq);
-    platSeason.textContent  = label(platReq);
-
-    // cores ✔ e ❌
-    [smallSeason, bigSeason, goldSeason, platSeason].forEach((el, i) => {
-        const req = [smallReq, bigReq, goldReq, platReq][i];
-
-        if (games >= req) {
-            el.style.color = "#76ff76"; // verde ✔
-        } else if (el.textContent === "❌") {
-            el.style.color = ""; // normal
-        } else {
-            el.style.color = ""; // normal season + idade
-        }
-    });
+function targetMoment(req) {
+  return whenGamesReached(
+    currentSeason,
+    gd.day,
+    games,
+    req
+  );
 }
+
+
+
+function label(req) {
+  const moment = targetMoment(req);
+
+  // impossível antes de reformar
+  if (moment.season > retireSeason) return "❌";
+
+  if (games < req) {
+    const ageAtSeason = age + (moment.season - currentSeason);
+
+    if (ageAtSeason >= 40) return "❌";
+
+    return `S${moment.season} D${moment.day} (${ageAtSeason}yo)`;
+  }
+
+  return "✔";
+}
+
+
+
+  tinyEl.textContent  = label(tinyReq);
+  smallEl.textContent = label(smallReq);
+  bigEl.textContent   = label(bigReq);
+  goldEl.textContent  = label(goldReq);
+  platEl.textContent  = label(platReq);
+
+  [
+    [tinyEl, tinyReq],
+    [smallEl, smallReq],
+    [bigEl, bigReq],
+    [goldEl, goldReq],
+    [platEl, platReq]
+  ].forEach(([el, req]) => {
+    el.style.color = games >= req ? "#76ff76" : "";
+  });
+}
+
 
 /* --- DOM READY: setup loyal + games input listeners --- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1577,20 +1683,32 @@ function computeMaxCareerHeart() {
   const currentSeason = gd.season;
   const loyal = document.getElementById("loyal-status").textContent === "YES";
 
-  let smallReq = 100, bigReq = 200, goldReq = 400, platReq = 800;
-  if (loyal) {
+let tinyReq  = 50;
+let smallReq = 100;
+let bigReq   = 200;
+let goldReq  = 400;
+let platReq  = 800;
+
+if (loyal) {
+    tinyReq  = Math.floor(tinyReq * 0.75);
     smallReq = Math.floor(smallReq * 0.75);
     bigReq = Math.floor(bigReq * 0.75);
     goldReq = Math.floor(goldReq * 0.75);
     platReq = Math.floor(platReq * 0.75);
   }
 
-  function seasonGainFor(req) {
-    const missing = Math.max(0, req - gamesPlayed);
-    const seasonsNeeded = Math.ceil(missing / 55);
-    return currentSeason + seasonsNeeded;
-  }
+function seasonGainFor(req) {
+  return whenGamesReached(
+    currentSeason,
+    gd.day,
+    gamesPlayed,
+    req
+  );
+}
 
+
+
+const tinySeason = seasonGainFor(tinyReq);
   const smallSeason = seasonGainFor(smallReq);
   const bigSeason   = seasonGainFor(bigReq);
   const goldSeason  = seasonGainFor(goldReq);
@@ -1604,21 +1722,26 @@ function computeMaxCareerHeart() {
   let finalSeason = null;
 
   if (platSeason <= retireSeason) {
-    icon = ICON_PLAT_HTML;
-    finalSeason = "S" + platSeason;
+  icon = ICON_PLAT_HTML;
+  finalSeason = "S" + platSeason;
 
-  } else if (goldSeason <= retireSeason) {
-    icon = ICON_GOLD_HTML;
-    finalSeason = "S" + goldSeason;
+} else if (goldSeason <= retireSeason) {
+  icon = ICON_GOLD_HTML;
+  finalSeason = "S" + goldSeason;
 
-  } else if (bigSeason <= retireSeason) {
-    icon = ICON_BIG_HTML;
-    finalSeason = "S" + bigSeason;
+} else if (bigSeason <= retireSeason) {
+  icon = ICON_BIG_HTML;
+  finalSeason = "S" + bigSeason;
 
-  } else if (smallSeason <= retireSeason) {
-    icon = ICON_SMALL_HTML; // ❤️ pequeno com classe especial
-    finalSeason = "S" + smallSeason;
-  }
+} else if (smallSeason <= retireSeason) {
+  icon = ICON_SMALL_HTML;
+  finalSeason = "S" + smallSeason;
+
+} else if (tinySeason <= retireSeason) {
+  icon = ICON_TINY_HTML; // ou ICON_TINY_HTML
+  finalSeason = "S" + tinySeason;
+}
+
 
 
   const maxLine = document.querySelector(".max-heart-final");
@@ -1662,10 +1785,11 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.4.2 - 01:35 - December.30.2025";
+  v.textContent = "v1.4.3 - 04:28 - December.30.2025";
 
   u.innerHTML = `
-    <li>New Heart mechanism boost</li>
+    <li>Fix exact game-based heart calculation</li>
+    <li>New heart mechanism boost</li>
     <li>Fixed Total Skill Tooltip & boost cap tooltip info</li>
     <li>Add Boost Bar over 100 until 120</li>
     <li>Fix Minimap Position</li>

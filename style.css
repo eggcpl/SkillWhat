@@ -938,6 +938,11 @@ filter: brightness(1.2);
     transform: translateX(1.5px) scale(0.75);
     transform-origin: left center;
 }
+.heart-small3 {
+    display: inline-block;
+    transform: translateX(2.7px) scale(0.65);
+    transform-origin: left center;
+}
 
 .games-active {
     filter: brightness(1.5);
@@ -1425,4 +1430,21 @@ pointer-events: auto;
 
 .boost-tooltip.visible {
   opacity: 1;
+}
+
+.action-col {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.boost-label {
+  position: absolute;
+  bottom: -17px;   /* ajusta fino aqui */
+  font-size: 11px;
+  font-weight: 700;
+  color: #01a501;
+  pointer-events: none;
+  line-height: 1;
 }
