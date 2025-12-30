@@ -1721,25 +1721,25 @@ const tinySeason = seasonGainFor(tinyReq);
   let icon = null;
   let finalSeason = null;
 
-  if (platSeason <= retireSeason) {
+  if (platSeason.season <= retireSeason) {
   icon = ICON_PLAT_HTML;
-  finalSeason = "S" + platSeason;
+  finalSeason = "S" + platSeason.season;
 
-} else if (goldSeason <= retireSeason) {
+} else if (goldSeason.season <= retireSeason) {
   icon = ICON_GOLD_HTML;
-  finalSeason = "S" + goldSeason;
+  finalSeason = "S" + goldSeason.season;
 
-} else if (bigSeason <= retireSeason) {
+} else if (bigSeason.season <= retireSeason) {
   icon = ICON_BIG_HTML;
-  finalSeason = "S" + bigSeason;
+  finalSeason = "S" + bigSeason.season;
 
-} else if (smallSeason <= retireSeason) {
+} else if (smallSeason.season <= retireSeason) {
   icon = ICON_SMALL_HTML;
-  finalSeason = "S" + smallSeason;
+  finalSeason = "S" + smallSeason.season;
 
-} else if (tinySeason <= retireSeason) {
+} else if (tinySeason.season <= retireSeason) {
   icon = ICON_TINY_HTML; // ou ICON_TINY_HTML
-  finalSeason = "S" + tinySeason;
+  finalSeason = "S" + tinySeason.season;
 }
 
 
@@ -1785,9 +1785,10 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.4.3 - 04:28 - December.30.2025";
+  v.textContent = "v1.4.4 - 05:20 - December.30.2025";
 
   u.innerHTML = `
+    <li>visual % boost</li>
     <li>Fix exact game-based heart calculation</li>
     <li>New heart mechanism boost</li>
     <li>Fixed Total Skill Tooltip & boost cap tooltip info</li>
