@@ -119,7 +119,10 @@ const GAMES_PER_DAY = {
   32: 7
 };
 
-
+let extendedCareer = false; // OFF por defeito
+function getMaxCareerAge() {
+  return extendedCareer ? 42 : 40;
+}
 let heartState = 0;
 let moraleState = 0;
 let maxMode = false;
@@ -379,11 +382,13 @@ function computeRetireSeasonFrom(age, birthdayDay) {
     return { remainingSeasons: null, finalSeason: null, reason: "unknown age" };
   }
 
-  if (age >= 40) {
-    return { remainingSeasons: 0, finalSeason: currentSeason, reason: "already 40+" };
-  }
+  const maxAge = getMaxCareerAge();
 
-  let remaining = 40 - age;
+if (age >= maxAge) {
+  return { remainingSeasons: 0, finalSeason: currentSeason, reason: "already max age" };
+}
+
+let remaining = maxAge - age;
   if (birthdayDay !== null && typeof birthdayDay === "number") {
     if (birthdayDay > currentDay) {
       remaining = remaining - 1;
@@ -405,7 +410,8 @@ function updateRetireElement(ageStr) {
     retireEl.textContent = "—";
     return;
   }
-  retireEl.textContent = `S${r.finalSeason}`;
+  const maxAge = getMaxCareerAge();
+retireEl.textContent = `S${r.finalSeason} (${maxAge}yo)`;
 }
 
 function updateRetireDisplayIfNeeded() {
@@ -868,7 +874,9 @@ function hideTooltip() {
 /* ---------------- LOAD ---------------- */
 if (loadBtn) {
   loadBtn.addEventListener("click", () => {
-
+extendedCareer = false;
+const careerBtn = document.getElementById("career-plus-btn");
+if (careerBtn) careerBtn.classList.remove("active");
     // FULL RESET — igual ao RUBBER (limpa estado UI e valores temporários)
     heartState = 0;
     moraleState = 0;
@@ -1430,7 +1438,9 @@ if (rubber) {
     heartState = 0;
     moraleState = 0;
     maxMode = false;
-
+extendedCareer = false;
+const careerBtn = document.getElementById("career-plus-btn");
+if (careerBtn) careerBtn.classList.remove("active");
     if (heartBtn)  heartBtn.className = "action-btn heart-grey-btn";
     if (moraleBtn) moraleBtn.className = "action-btn morale-btn";
     if (maxBtn)    maxBtn.classList.remove("max-active");
@@ -1567,7 +1577,8 @@ function label(req) {
   if (games < req) {
     const ageAtSeason = age + (moment.season - currentSeason);
 
-    if (ageAtSeason >= 40) return "❌";
+    const maxAge = getMaxCareerAge();
+if (ageAtSeason >= maxAge) return "❌";
 
     return `S${moment.season} D${moment.day} (${ageAtSeason}yo)`;
   }
@@ -1597,6 +1608,27 @@ function label(req) {
 
 /* --- DOM READY: setup loyal + games input listeners --- */
 document.addEventListener('DOMContentLoaded', () => {
+  const careerBtn = document.getElementById("career-plus-btn");
+
+if (careerBtn) {
+  careerBtn.addEventListener("click", () => {
+    // toggle ON / OFF
+    extendedCareer = !extendedCareer;
+
+    // estado visual
+    careerBtn.classList.toggle("active", extendedCareer);
+
+    // 🔥 recalcular tudo o que depende da idade
+    updateRetireDisplayIfNeeded();
+
+    const gamesPlayed =
+      parseInt(document.getElementById("games-played")?.textContent, 10) || 0;
+
+    updateHeartsBasedOnGames(gamesPlayed);
+    computeMaxCareerHeart();
+  });
+}
+
   const gameImgBtn = document.getElementById('game-img-btn');
   const loyalStatusEl = document.getElementById('loyal-status');
 
@@ -1714,7 +1746,8 @@ const tinySeason = seasonGainFor(tinyReq);
   const goldSeason  = seasonGainFor(goldReq);
   const platSeason  = seasonGainFor(platReq);
 
-  let seasonsLeft = 40 - age;
+  const maxAge = getMaxCareerAge();
+let seasonsLeft = maxAge - age;
   if (birthdayDay && birthdayDay > gd.day) seasonsLeft -= 1;
   const retireSeason = currentSeason + Math.max(seasonsLeft, 0);
 
@@ -1785,9 +1818,11 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.4.4 - 05:20 - December.30.2025";
+  v.textContent = "v1.4.9 - 02:58 - January.13.2026";
 
   u.innerHTML = `
+    <li>Long Lived icon added</li>
+    <li>info png fix</li>
     <li>visual % boost</li>
     <li>Fix exact game-based heart calculation</li>
     <li>New heart mechanism boost</li>
