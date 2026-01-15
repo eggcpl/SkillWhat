@@ -8,6 +8,16 @@ const ICON_BIG_HTML   = '❤️';
 const ICON_GOLD_HTML  = '💛';
 const ICON_PLAT_HTML  = '💙';
 
+const GEAR_ICON_BY_SKILL = {
+  Aim: "https://i.postimg.cc/349bq0ZG/aim.png",
+  Awareness: "https://i.postimg.cc/xJgFZNPL/awarness.png",
+  Determination: "https://i.postimg.cc/C5VTzjBP/determination.png",
+  Gamesense: "https://i.postimg.cc/Vr4Hh0Fj/gamesense.png",
+  Handling: "https://i.postimg.cc/njTwW914/handling.png",
+  Movement: "https://i.postimg.cc/4HdFR48K/movement.png",
+  Quickness: "https://i.postimg.cc/kR4hPMjB/quickness.png",
+  Teamplay: "https://i.postimg.cc/V06HPs7J/teamplay.png"
+};
 
 let missingPopupOpen = false;
 
@@ -1110,10 +1120,26 @@ function renderCategory(id, items) {
       b.classList.add("equipped");
     }
 
-    b.innerHTML = `
-      <div class="gear-name">${it.name}</div>
-      <div class="gear-booststr">${it.tokens}</div>
-    `;
+const boostsHtml = Object.entries(it.boosts)
+  .map(([skill, val]) => `
+    <span class="gear-boost">
+      +${val}
+      <img
+        class="gear-boost-icon"
+        src="${GEAR_ICON_BY_SKILL[skill]}"
+        alt="${skill}"
+      />
+    </span>
+  `)
+  .join(" ");
+
+b.innerHTML = `
+  <div class="gear-name">${it.name}</div>
+  <div class="gear-boosts">
+    ${boostsHtml}
+  </div>
+`;
+
 
     b.addEventListener("click", () => {
       equipped[cat] =
@@ -1818,9 +1844,10 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.4.9 - 02:58 - January.13.2026";
+  v.textContent = "v1.4.12 - 13:55 - January.15.2026";
 
   u.innerHTML = `
+    <li>Visual update gear</li>
     <li>Long Lived icon added</li>
     <li>info png fix</li>
     <li>visual % boost</li>

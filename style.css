@@ -579,35 +579,36 @@ filter: brightness(1.2);
 }
 
 /* ===== POPUP OVERLAY ===== */
+
 #gear-popup {
     position: fixed;
     top: 150px;
     left: 150px;
-    width: 300px;
-    height: 300px;
     z-index: 9999;
+
+    padding: 8px;          /* 🔥 margem REAL à volta */
 }
+
 .gear-popup.hidden {
     display: none;
 }
 
 /* ===== POPUP CAIXA PRINCIPAL (350x500) ===== */
 .gear-popup-inner {
-    user-select: none;     /* 🔥 impede copiar */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;position: absolute;
-    width: 300px;
-    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+position: relative;   /* 🔥 obrigatório */
+    width: fit-content;    /* 🔥 CHAVE */
+    max-width: 90vw;       /* segurança */
+
     background: #1c1c1e;
     border-radius: 12px;
     border: 1px solid #2b2b2b;
-    padding: 20px 20px 15px 20px; 
-    display: flex;
-    flex-direction: column;
+    padding: 20px;
+
+    gap: 12px;
     box-shadow: 0 6px 30px rgba(0,0,0,0.6);
-    overflow-y: hidden;
-    gap: 10px 10px;         /* 35px = row-gap, 10px = column-gap */
 }
 
 #gear-drag {
@@ -646,7 +647,7 @@ filter: brightness(1.2);
 .gear-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px 10px;         /* 35px = row-gap, 10px = column-gap */
+  gap: 15px 2px;         /* 35px = row-gap, 10px = column-gap */
   align-items: start;
   justify-content: center;
   grid-template-columns: repeat(4, 1fr);
@@ -655,21 +656,27 @@ filter: brightness(1.2);
 
 /* ===== QUADRADOS ===== */
 .gear-item {
+    width: 70px;          /* 🔥 escolhe o valor da 1ª linha */
+    min-width: 70px;
+    max-width: 70px;
+
     background: #efe3cf;
     color: #1b1b1b;
     border-radius: 6px;
-    padding: 6px 4px;
-    min-height: 20px;        /* 🔥 reduzido */
+    padding: 6px 12px;
+    min-height: 34px;
     cursor: pointer;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 10px;         /* 🔥 letra mais pequena */
+
+    font-size: 10px;
     box-shadow: 0 2px 0 rgba(0,0,0,0.15);
     transition: 0.12s ease;
-    
 }
+
 
 .gear-item:hover {
     transform: translateY(-2px);
@@ -712,10 +719,11 @@ filter: brightness(1.2);
     display: none !important;
 }
 .gear-name {
-    font-size: 8px;      /* 🔽 antes 13px */
+    font-size: 9px;      /* 🔽 antes 13px */
     font-weight: 700;
     text-align: center;
     line-height: 11px;    /* 🔽 mais compacto */
+    margin-bottom: 3px;      /* 🔥 GAP entre nome e boosts */
 }
 
 #gear-lock-btn {
@@ -1477,3 +1485,30 @@ pointer-events: auto;
   pointer-events: none;
   line-height: 1;
 }
+
+.gear-boosts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;          /* espaço entre +2[icon] e +1[icon] */
+  margin-top: 4px;
+}
+
+.gear-boost {
+  display: inline-flex;
+  align-items: center;   /* 🔥 alinha verticalmente */
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #1b1b1b;
+  line-height: 1;        /* 🔥 remove offset estranho */
+  white-space: nowrap;
+}
+
+.gear-boost-icon {
+  width: 11px;            /* 🔥 MAIS PEQUENO */
+  height: 11px;
+  object-fit: contain;
+  transform: translateY(0px); /* 🔥 micro-ajuste óptico */
+}
+
