@@ -1882,7 +1882,17 @@ document.addEventListener("DOMContentLoaded", () => {
   computeMaxCareerHeart();
   updateGamesButtonState();
 });
+document.addEventListener("DOMContentLoaded", () => {
+  const clearBtn = document.getElementById("clear-load-btn");
+  const input = document.getElementById("skill-input");
 
+  if (!clearBtn || !input) return;
+
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    input.focus();
+  });
+});
 document.addEventListener("DOMContentLoaded", () => {
   const exportBtn = document.getElementById("export-card-btn");
 const totalBox = document.querySelector(".total-skill-box");
@@ -1940,5 +1950,6 @@ const totalBox = document.querySelector(".total-skill-box");
     } catch (e) {
       console.error("EXPORT FAILED", e);
     }
+    
   });
 });

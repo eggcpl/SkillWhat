@@ -278,7 +278,7 @@ body {
     border-radius: 21px 0 21px 0px;
     border: none;
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
     background: #f56e0eff;
     transition: 0.2s ease; 
@@ -1136,8 +1136,8 @@ position: relative;   /* 🔥 obrigatório */
 /* Botão "i" */
 .info-btn {
     position: absolute;
-    left: 210px;
-    top: -59px;
+    left: 207px;
+    top: -199px;
     width: 20px;
     height: 20px;
     background-color: transparent !important;
@@ -1512,3 +1512,31 @@ pointer-events: auto;
   transform: translateY(0px); /* 🔥 micro-ajuste óptico */
 }
 
+.clear-load-btn {
+  position: absolute;
+
+  /* ajusta conforme o sítio que queres */
+  left: 171px;
+  top: -39px;
+
+  width: 18px;
+  height: 18px;
+
+  border: none;
+  background-color: transparent;
+
+  background-image: url("https://i.postimg.cc/fLw4XzLr/Xclear.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+
+  cursor: pointer;
+  z-index: 9999;
+
+  padding: 0;
+  transition: filter 0.15s ease;
+}
+
+.clear-load-btn:hover {
+  filter: brightness(1.3);
+}
