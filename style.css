@@ -20,7 +20,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-
+    box-sizing: border-box;
     width: 932px;
     height: 459px;
 
@@ -845,13 +845,13 @@ position: relative;   /* 🔥 obrigatório */
   width: 30px;
   height: 30px;
 
-  background-image: url('https://i.postimg.cc/jxHWnWYt/rect1.png');
-  background-size: 70%;
+  background-image: url('https://i.postimg.cc/XNt2syXC/longlived.png');
+  background-size: 90%;
   background-position: center;
   background-repeat: no-repeat;
 
   position: absolute;
-  left: 230px;   /* 👈 ao lado do LOYAL (ajusta fino se quiseres) */
+  left: 265px;   /* 👈 ao lado do LOYAL (ajusta fino se quiseres) */
   top: 173px;
 
   border: none;
@@ -1047,7 +1047,7 @@ position: relative;   /* 🔥 obrigatório */
 /* COLUNA GLOBAL */
 .skill-edit-column {
     position: absolute;
-    right: 140px;
+    right:80px;
     top: 222px;
     display: flex;
     flex-direction: column;
@@ -1516,8 +1516,8 @@ pointer-events: auto;
   position: absolute;
 
   /* ajusta conforme o sítio que queres */
-  left: 171px;
-  top: -39px;
+  left: 168px;
+  top: -38px;
 
   width: 18px;
   height: 18px;
@@ -1531,7 +1531,7 @@ pointer-events: auto;
   background-size: 100%;
 
   cursor: pointer;
-  z-index: 9999;
+  z-index: 9997;
 
   padding: 0;
   transition: filter 0.15s ease;
@@ -1540,3 +1540,70 @@ pointer-events: auto;
 .clear-load-btn:hover {
   filter: brightness(1.3);
 }
+
+.antisocial-btn {
+  width: 30px;
+  height: 30px;
+
+  position: absolute;
+  top: 173px;
+  left: 230px;
+
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  background-image: url("https://i.postimg.cc/66FHMGTG/antisocial.png");
+  background-size: 90%;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  filter: brightness(0.5); /* OFF */
+}
+
+.antisocial-btn.active {
+  filter: brightness(1); /* ON */
+}
+
+.shortlived-btn {
+  width: 30px;
+  height: 30px;
+
+  position: absolute;
+  top: 173px;
+  left: 300px;
+
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  background-image: url("https://i.postimg.cc/66FHMGTZ/shortlived.png");
+  background-size: 90%;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  filter: brightness(0.5); /* OFF */
+}
+
+.shortlived-btn.active {
+  filter: brightness(1); /* ON */
+}
+
+.mini-tooltip {
+  position: fixed;
+  background: rgb(0, 0, 0);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.mini-tooltip.hidden {
+  display: none;
+}
+

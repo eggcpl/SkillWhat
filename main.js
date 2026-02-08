@@ -130,8 +130,11 @@ const GAMES_PER_DAY = {
 };
 
 let extendedCareer = false; // OFF por defeito
+let shortLived = false;
 function getMaxCareerAge() {
-  return extendedCareer ? 42 : 40;
+  if (shortLived) return 38;
+  if (extendedCareer) return 42;
+  return 40;
 }
 let heartState = 0;
 let moraleState = 0;
@@ -886,7 +889,18 @@ if (loadBtn) {
   loadBtn.addEventListener("click", () => {
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
+
+
 if (careerBtn) careerBtn.classList.remove("active");
+// RESET SHORT LIVED
+shortLived = false;
+const shortBtn = document.getElementById("shortlived-btn");
+if (shortBtn) shortBtn.classList.remove("active");
+
+// RESET ANTISOCIAL
+const antiBtn = document.getElementById("antisocial-btn");
+if (antiBtn) antiBtn.classList.remove("active");
+
     // FULL RESET — igual ao RUBBER (limpa estado UI e valores temporários)
     heartState = 0;
     moraleState = 0;
@@ -1199,17 +1213,26 @@ function updateGearButtonState() {
 function updateGamesButtonState() {
   const gamesBtn = document.querySelector(".games-btn");
   if (!gamesBtn) return;
-  const gamesPlayedEl = document.getElementById("games-played");
-  const gamesPlayed = gamesPlayedEl ? parseInt(gamesPlayedEl.textContent, 10) || 0 : 0;
-  const loyalEl = document.getElementById("loyal-status");
-  const loyal = loyalEl && loyalEl.textContent === "YES";
 
-  if (gamesPlayed > 0 || loyal) {
+  const gamesPlayed =
+    parseInt(document.getElementById("games-played")?.textContent, 10) || 0;
+
+  const loyal =
+    document.getElementById("loyal-status")?.textContent === "YES";
+
+  const antisocial =
+    document.getElementById("antisocial-btn")?.classList.contains("active");
+
+  const longLived = extendedCareer === true; // 🔥 NOVO
+
+if (gamesPlayed > 0 || loyal || antisocial || extendedCareer || shortLived) {
     gamesBtn.classList.add("games-active");
   } else {
     gamesBtn.classList.remove("games-active");
   }
 }
+
+
 function openMissingSkillPopup(list) {
   if (missingPopupOpen) return; // ⛔ impede abrir de novo
     missingPopupOpen = true;      // 🔒 marca como aberto
@@ -1467,6 +1490,15 @@ if (rubber) {
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
 if (careerBtn) careerBtn.classList.remove("active");
+// RESET SHORT LIVED
+shortLived = false;
+const shortBtn = document.getElementById("shortlived-btn");
+if (shortBtn) shortBtn.classList.remove("active");
+
+// RESET ANTISOCIAL
+const antiBtn = document.getElementById("antisocial-btn");
+if (antiBtn) antiBtn.classList.remove("active");
+
     if (heartBtn)  heartBtn.className = "action-btn heart-grey-btn";
     if (moraleBtn) moraleBtn.className = "action-btn morale-btn";
     if (maxBtn)    maxBtn.classList.remove("max-active");
@@ -1537,20 +1569,24 @@ if (ageEl)  ageEl.textContent  = loadedAge;
     updateRetireDisplayIfNeeded();
   });
 }
-function updateHeartRequirementLabels(loyal) {
+function updateHeartRequirementLabels() {
   const rows = document.querySelectorAll(".heart-row");
 
- const base = [50, 100, 200, 400, 800];
-const loyalVals = [37, 75, 150, 300, 600];
+  const base = [50, 100, 200, 400, 800];
+
+  let mult = 1;
+
+  if (document.getElementById("loyal-status").textContent === "YES") mult = 0.75;
+  if (document.getElementById("antisocial-btn").classList.contains("active")) mult = 1.25;
 
   rows.forEach((row, i) => {
     const span = row.querySelector("span:nth-child(2)");
     if (!span) return;
 
-    const value = loyal ? loyalVals[i] : base[i];
-    span.textContent = `${value} games → `;
+    span.textContent = `${Math.floor(base[i] * mult)} games → `;
   });
 }
+
 function updateHeartsBasedOnGames(games) {
   const tinyEl  = document.querySelector(".season-tiny");
   const smallEl = document.querySelector(".season-small");
@@ -1561,6 +1597,7 @@ function updateHeartsBasedOnGames(games) {
   if (!tinyEl || !smallEl || !bigEl || !goldEl || !platEl) return;
 
   const loyal = document.getElementById("loyal-status").textContent === "YES";
+const antisocial = document.getElementById("antisocial-btn")?.classList.contains("active");
 
   let tinyReq  = 50;
   let smallReq = 100;
@@ -1568,13 +1605,16 @@ function updateHeartsBasedOnGames(games) {
   let goldReq  = 400;
   let platReq  = 800;
 
-  if (loyal) {
-    tinyReq  = Math.floor(50 * 0.75);
-    smallReq = Math.floor(100 * 0.75);
-    bigReq   = Math.floor(200 * 0.75);
-    goldReq  = Math.floor(400 * 0.75);
-    platReq  = Math.floor(800 * 0.75);
-  }
+ let mult = 1;
+if (loyal) mult = 0.75;
+if (antisocial) mult = 1.25;
+
+tinyReq  = Math.floor(50 * mult);
+smallReq = Math.floor(100 * mult);
+bigReq   = Math.floor(200 * mult);
+goldReq  = Math.floor(400 * mult);
+platReq  = Math.floor(800 * mult);
+
 
   const ageText = document.querySelector(".player-age")?.textContent || "";
   const { age, birthdayDay } = parseAgeString(ageText);
@@ -1635,11 +1675,41 @@ if (ageAtSeason >= maxAge) return "❌";
 /* --- DOM READY: setup loyal + games input listeners --- */
 document.addEventListener('DOMContentLoaded', () => {
   const careerBtn = document.getElementById("career-plus-btn");
+  const antiBtn = document.getElementById("antisocial-btn");
+  const shortBtn = document.getElementById("shortlived-btn"); 
+if (shortBtn) {
+  shortBtn.addEventListener("click", () => {
+    shortLived = !shortLived;
+
+    if (shortLived) {
+      extendedCareer = false;
+      careerBtn.classList.remove("active");
+      shortBtn.classList.add("active");
+    } else {
+      shortBtn.classList.remove("active");
+    }
+
+    updateRetireDisplayIfNeeded();
+
+    const gamesPlayed =
+      parseInt(document.getElementById("games-played")?.textContent, 10) || 0;
+
+    updateHeartsBasedOnGames(gamesPlayed);
+    computeMaxCareerHeart();
+    updateGamesButtonState();
+  });
+}
 
 if (careerBtn) {
   careerBtn.addEventListener("click", () => {
     // toggle ON / OFF
     extendedCareer = !extendedCareer;
+
+    if (extendedCareer) {
+  shortLived = false;
+  shortBtn.classList.remove("active");
+}
+
 
     // estado visual
     careerBtn.classList.toggle("active", extendedCareer);
@@ -1652,6 +1722,7 @@ if (careerBtn) {
 
     updateHeartsBasedOnGames(gamesPlayed);
     computeMaxCareerHeart();
+    updateGamesButtonState();
   });
 }
 
@@ -1663,36 +1734,78 @@ if (careerBtn) {
     gameImgBtn.classList.remove('active');
     if (loyalStatusEl) loyalStatusEl.textContent = 'NO';
 
-    let originalGamesBeforeLoyal = null;
 
-gameImgBtn.addEventListener('click', () => {
-  const isOn = gameImgBtn.classList.toggle('active');
-  const loyalStatusEl = document.getElementById("loyal-status");
+let loyalActive = false;
+let antisocialActive = false;
+let originalGamesBeforeModifier = null;
+
+function applyGameModifier(multiplier) {
   const gamesPlayedEl = document.getElementById("games-played");
-
-  if (loyalStatusEl) loyalStatusEl.textContent = isOn ? 'YES' : 'NO';
-
   let games = parseInt(gamesPlayedEl.textContent, 10) || 0;
 
-  if (isOn) {
-    originalGamesBeforeLoyal = games;
-    const reduced = Math.floor(games * 0.75);
-    gamesPlayedEl.textContent = reduced;
+  if (originalGamesBeforeModifier === null) {
+    originalGamesBeforeModifier = games;
+  }
 
-    updateHeartRequirementLabels(true);   // 🔥 AQUI
-    updateHeartsBasedOnGames(reduced);
+  const modified = Math.floor(originalGamesBeforeModifier * multiplier);
+  gamesPlayedEl.textContent = modified;
+
+
+  updateHeartsBasedOnGames(modified);
+  computeMaxCareerHeart();
+  updateGamesButtonState();
+}
+
+/* LOYAL */
+gameImgBtn.addEventListener("click", () => {
+  loyalActive = !loyalActive;
+
+  if (loyalActive) {
+    antisocialActive = false;
+    antiBtn.classList.remove("active");
+
+    gameImgBtn.classList.add("active");
+    document.getElementById("loyal-status").textContent = "YES";
+
+    applyGameModifier(0.75);
   } else {
-    if (originalGamesBeforeLoyal !== null) {
-      gamesPlayedEl.textContent = originalGamesBeforeLoyal;
+    gameImgBtn.classList.remove("active");
+    document.getElementById("loyal-status").textContent = "NO";
 
-      updateHeartRequirementLabels(false); // 🔥 AQUI
-      updateHeartsBasedOnGames(originalGamesBeforeLoyal);
-    }
+    document.getElementById("games-played").textContent = originalGamesBeforeModifier || 0;
+    originalGamesBeforeModifier = null;
+
+    updateHeartRequirementLabels(false);
+    updateHeartsBasedOnGames(0);
+    updateGamesButtonState();
+  }
+});
+
+/* ANTI SOCIAL */
+antiBtn.addEventListener("click", () => {
+  antisocialActive = !antisocialActive;
+
+  if (antisocialActive) {
+    loyalActive = false;
+    gameImgBtn.classList.remove("active");
+    document.getElementById("loyal-status").textContent = "NO";
+
+    antiBtn.classList.add("active");
+    applyGameModifier(1.25);
+  } else {
+    antiBtn.classList.remove("active");
+
+    document.getElementById("games-played").textContent = originalGamesBeforeModifier || 0;
+    originalGamesBeforeModifier = null;
+
+    updateHeartRequirementLabels(false);
+    updateHeartsBasedOnGames(0);
   }
 
   computeMaxCareerHeart();
   updateGamesButtonState();
 });
+
 
 
   }
@@ -1740,6 +1853,7 @@ function computeMaxCareerHeart() {
   const gd = calculateGameDate();
   const currentSeason = gd.season;
   const loyal = document.getElementById("loyal-status").textContent === "YES";
+const antisocial = document.getElementById("antisocial-btn")?.classList.contains("active");
 
 let tinyReq  = 50;
 let smallReq = 100;
@@ -1747,13 +1861,16 @@ let bigReq   = 200;
 let goldReq  = 400;
 let platReq  = 800;
 
-if (loyal) {
-    tinyReq  = Math.floor(tinyReq * 0.75);
-    smallReq = Math.floor(smallReq * 0.75);
-    bigReq = Math.floor(bigReq * 0.75);
-    goldReq = Math.floor(goldReq * 0.75);
-    platReq = Math.floor(platReq * 0.75);
-  }
+let mult = 1;
+if (loyal) mult = 0.75;
+if (antisocial) mult = 1.25;
+
+tinyReq  = Math.floor(50 * mult);
+smallReq = Math.floor(100 * mult);
+bigReq   = Math.floor(200 * mult);
+goldReq  = Math.floor(400 * mult);
+platReq  = Math.floor(800 * mult);
+
 
 function seasonGainFor(req) {
   return whenGamesReached(
@@ -1844,9 +1961,10 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.4.12 - 13:55 - January.15.2026";
+  v.textContent = "v1.6.1 - 3:59 - February.8.2026";
 
   u.innerHTML = `
+    <li>Add AntiSocial & Short Lived Icon</li> 
     <li>Visual update gear</li>
     <li>Long Lived icon added</li>
     <li>info png fix</li>
@@ -1908,48 +2026,72 @@ const totalBox = document.querySelector(".total-skill-box");
   }
 
   exportBtn.addEventListener("click", async () => {
-    const card = document.querySelector(".card");
-    if (!card) return;
+  const card = document.querySelector(".card");
+  if (!card) return;
 
-    const nameEl = document.querySelector(".player-name");
-    let filename = "skillwhat";
+  let filename = "skillwhat";
+  const nameEl = document.querySelector(".player-name");
 
-    if (nameEl && nameEl.textContent.trim()) {
-      filename = nameEl.textContent
-        .trim()
-        .replace(/\s+/g, "_")
-        .replace(/[^\w\-]/g, "");
-    }
+  if (nameEl && nameEl.textContent.trim()) {
+    filename = nameEl.textContent
+      .trim()
+      .replace(/\s+/g, "_")
+      .replace(/[^\w\-]/g, "");
+  }
 
-    try {
-      // Clona o card para evitar afetar o DOM
-      const clone = card.cloneNode(true);
-      clone.style.margin = "0";
-      clone.style.boxShadow = "none";
+  try {
+    const clone = card.cloneNode(true);
+    clone.style.margin = "0";
+    clone.style.boxShadow = "none";
 
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "absolute";
-      wrapper.style.top = "-9999px";
-      wrapper.style.left = "-9999px";
-      wrapper.appendChild(clone);
-      document.body.appendChild(wrapper);
+    const wrapper = document.createElement("div");
+    wrapper.style.position = "fixed";
+    wrapper.style.left = "-10000px";
+    wrapper.style.top = "0";
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
 
-      const dataUrl = await htmlToImage.toPng(clone, {
-        backgroundColor: null,
-        width: clone.offsetWidth,
-        height: clone.offsetHeight,
-        pixelRatio: 2
-      });
+    const dataUrl = await htmlToImage.toPng(clone, {
+      backgroundColor: "#000",
+      pixelRatio: 2   // 👈 ISTO gera 1864x918
+    });
 
-      document.body.removeChild(wrapper);
+    document.body.removeChild(wrapper);
 
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `${filename}.png`;
-      link.click();
-    } catch (e) {
-      console.error("EXPORT FAILED", e);
-    }
-    
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = `${filename}.png`;
+    link.click();
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+});
+// ===== MINI TOOLTIP FOR MODIFIERS =====
+const miniTooltip = document.getElementById("mini-tooltip");
+
+function bindMiniTooltip(el, text) {
+  if (!el) return;
+
+  el.addEventListener("mouseenter", () => {
+    miniTooltip.textContent = text;
+    miniTooltip.classList.remove("hidden");
   });
+
+  el.addEventListener("mousemove", e => {
+    miniTooltip.style.left = e.clientX + 16 + "px";
+    miniTooltip.style.top  = e.clientY + 1 + "px";
+  });
+
+  el.addEventListener("mouseleave", () => {
+    miniTooltip.classList.add("hidden");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  bindMiniTooltip(document.getElementById("game-img-btn"), "Loyal");
+  bindMiniTooltip(document.getElementById("career-plus-btn"), "Long Lived");
+  bindMiniTooltip(document.getElementById("antisocial-btn"), "Anti Social");
+  bindMiniTooltip(document.getElementById("shortlived-btn"), "Short Lived");
 });
