@@ -886,7 +886,7 @@ function hideTooltip() {
 
 /* ---------------- LOAD ---------------- */
 if (loadBtn) {
-  loadBtn.addEventListener("click", () => {
+  loadBtn.addEventListener("pointerdown", () => {
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
 
@@ -1827,7 +1827,7 @@ antiBtn.addEventListener("click", () => {
 
 
   if (gameOkBtn) {
-    gameOkBtn.addEventListener("click", () => {
+    gameOkBtn.addEventListener("pointerdown", () => {
       const value = parseInt(gameInput.value, 10);
       if (isNaN(value) || value < 0) return;
       if (gamesPlayedEl) gamesPlayedEl.textContent = value;
@@ -1964,7 +1964,7 @@ window.addEventListener("load", () => {
   v.textContent = "v1.6.1 - 3:59 - February.8.2026";
 
   u.innerHTML = `
-    <li>Add AntiSocial & Short Lived Icon</li> 
+    <li>Add Anti Social & Short Lived Icon</li> 
     <li>Visual update gear</li>
     <li>Long Lived icon added</li>
     <li>info png fix</li>
@@ -2006,7 +2006,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!clearBtn || !input) return;
 
-  clearBtn.addEventListener("click", () => {
+  clearBtn.addEventListener("pointerdown", () => {
     input.value = "";
     input.focus();
   });
