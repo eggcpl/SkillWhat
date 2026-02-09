@@ -885,10 +885,18 @@ function hideTooltip() {
 }
 
 /* ---------------- LOAD ---------------- */
+["touchend", "pointerup"].forEach(evt => {
+  loadBtn.addEventListener(evt, e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    document.activeElement.blur();
+
+    loadBtn.click();
+  });
+});
 if (loadBtn) {
-  loadBtn.addEventListener("pointerup", () => {
-  document.getElementById("skill-input").blur();
-  loadBtn.style.touchAction = "manipulation";
+  loadBtn.addEventListener("click", () => {
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
 
@@ -1963,7 +1971,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.7.1 - 3:59 - February.8.2026";
+  v.textContent = "v1.9.1 - 3:59 - February.8.2026";
 
   u.innerHTML = `
     <li>Add AntiSocial & Short Lived Icon</li> 
