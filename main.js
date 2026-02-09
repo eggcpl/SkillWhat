@@ -887,6 +887,7 @@ function hideTooltip() {
 /* ---------------- LOAD ---------------- */
 if (loadBtn) {
   loadBtn.addEventListener("pointerdown", () => {
+    console.log("LOAD TOUCHED");   // 👈 METE ESTA LINHA AQUI
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
 
