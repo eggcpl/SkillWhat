@@ -282,6 +282,7 @@ body {
     cursor: pointer;
     background: #f56e0eff;
     transition: 0.2s ease; 
+    display: none;
 }
 .load-btn:hover {
     background: #edeec0ff; /* a cor que pediste */
@@ -305,12 +306,16 @@ body {
     font-size: 18px;
 }
 .player-header {
+    white-space: nowrap;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 12px;
     margin-bottom: 15px;
     margin-left: 35px;
+}
+.player-name {
+  white-space: nowrap;
 }
 
 /* Botões ao lado do nome */

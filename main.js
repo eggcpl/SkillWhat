@@ -68,6 +68,23 @@ const heartBtn = document.querySelector(".heart-grey-btn");
 const moraleBtn = document.querySelector(".morale-btn");
 const maxBtn = document.querySelector(".max-btn");
 const loadBtn = document.getElementById("load-button");
+const skillInput = document.getElementById("skill-input");
+
+let autoLoadTimer = null;
+
+if (skillInput && loadBtn) {
+  skillInput.addEventListener("input", () => {
+    clearTimeout(autoLoadTimer);
+
+    autoLoadTimer = setTimeout(() => {
+      const txt = skillInput.value.trim();
+      if (txt.length > 0) {
+        loadBtn.click();
+      }
+    }, 200);
+  });
+}
+
 
 const START_DATE = new Date(2025, 3, 28);
 const SEASON_LENGTH = 35;
@@ -885,22 +902,8 @@ function hideTooltip() {
 }
 
 /* ---------------- LOAD ---------------- */
-
 if (loadBtn) {
-
-  ["touchend", "pointerup"].forEach(evt => {
-    loadBtn.addEventListener(evt, e => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      document.activeElement.blur();
-
-      loadBtn.click();
-    });
-  });
-
   loadBtn.addEventListener("click", () => {
-
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
 
@@ -1975,9 +1978,11 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.6.1 - 3:59 - February.8.2026";
+  v.textContent = "v1.9.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
+    <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
+    <li>Fixed export png - Text wrapping issue</li> 
     <li>Add AntiSocial & Short Lived Icon</li> 
     <li>Visual update gear</li>
     <li>Long Lived icon added</li>
@@ -2020,10 +2025,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!clearBtn || !input) return;
 
-  clearBtn.addEventListener("click", () => {
-    input.value = "";
-    input.focus();
-  });
+clearBtn.addEventListener("click", () => {
+  input.value = "";
+
+  // restaurar estado inicial completo
+  skills = JSON.parse(JSON.stringify(initialSkillsBackup));
+
+  loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
+  loadedName = "Spidevil";
+  loadedAge = "15yo (day 1)";
+
+  const nameEl = document.querySelector(".player-name");
+  const ageEl = document.querySelector(".player-age");
+
+  if (nameEl) nameEl.textContent = loadedName;
+  if (ageEl) ageEl.textContent = loadedAge;
+
+  heartState = 0;
+  moraleState = 0;
+  maxMode = false;
+
+  if (heartBtn) heartBtn.className = "action-btn heart-grey-btn";
+  if (moraleBtn) moraleBtn.className = "action-btn morale-btn";
+  if (maxBtn) maxBtn.classList.remove("max-active");
+
+  renderSkills();
+  renderMiniGear();
+  computeMaxCareerHeart();
+  updateTotals();
+
+  input.blur();
+});
+
+
 });
 document.addEventListener("DOMContentLoaded", () => {
   const exportBtn = document.getElementById("export-card-btn");
@@ -2109,13 +2143,3 @@ document.addEventListener("DOMContentLoaded", () => {
   bindMiniTooltip(document.getElementById("antisocial-btn"), "Anti Social");
   bindMiniTooltip(document.getElementById("shortlived-btn"), "Short Lived");
 });
-function manualLoad() {
-  const btn = document.getElementById("load-button");
-  if (!btn) return;
-
-  // força blur do teclado mobile
-  document.activeElement?.blur();
-
-  // dispara o handler original
-  btn.dispatchEvent(new Event("click", { bubbles: true }));
-}
