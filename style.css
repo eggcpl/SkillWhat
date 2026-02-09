@@ -1174,12 +1174,14 @@ position: relative;   /* 🔥 obrigatório */
   height: 100vh;
   background: rgba(0,0,0,0.5);
   z-index: 9998;
-  pointer-events: none; /* 🔥 CRÍTICO */
+  display: none;          /* 🔥 em vez de pointer-events */
 }
 
+
 .hidden {
-    display: none;
+  display: none !important;
 }
+
 .version-box {
   margin-top: 12px;
   padding: 10px 12px;
