@@ -282,6 +282,7 @@ body {
     cursor: pointer;
     background: #f56e0eff;
     transition: 0.2s ease; 
+    z-index: 999999;
 }
 .load-btn:hover {
     background: #edeec0ff; /* a cor que pediste */
@@ -1174,14 +1175,12 @@ position: relative;   /* 🔥 obrigatório */
   height: 100vh;
   background: rgba(0,0,0,0.5);
   z-index: 9998;
-  display: none;          /* 🔥 em vez de pointer-events */
+  pointer-events: none; /* 🔥 CRÍTICO */
 }
-
 
 .hidden {
-  display: none !important;
+    display: none;
 }
-
 .version-box {
   margin-top: 12px;
   padding: 10px 12px;
@@ -1609,6 +1608,3 @@ pointer-events: auto;
   display: none;
 }
 
-button {
-  touch-action: manipulation;
-}
