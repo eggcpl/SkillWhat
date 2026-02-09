@@ -237,6 +237,7 @@ body {
     outline: none;
     background: #e5dfcc;
     border-radius: 21px 0px 0px 21px;
+    z-index: 1;
 }
 
 /* Scroll bonito para a input-box */
@@ -270,7 +271,7 @@ body {
 }
 
 .load-btn {
-    position: absolute;
+    position: relative;
     left: 174px;
     top: 290px;
     width: 60px;
@@ -282,6 +283,7 @@ body {
     cursor: pointer;
     background: #f56e0eff;
     transition: 0.2s ease; 
+     z-index: 5;
 }
 .load-btn:hover {
     background: #edeec0ff; /* a cor que pediste */
