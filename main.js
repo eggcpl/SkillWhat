@@ -2109,3 +2109,13 @@ document.addEventListener("DOMContentLoaded", () => {
   bindMiniTooltip(document.getElementById("antisocial-btn"), "Anti Social");
   bindMiniTooltip(document.getElementById("shortlived-btn"), "Short Lived");
 });
+function manualLoad() {
+  const btn = document.getElementById("load-button");
+  if (!btn) return;
+
+  // força blur do teclado mobile
+  document.activeElement?.blur();
+
+  // dispara o handler original
+  btn.dispatchEvent(new Event("click", { bubbles: true }));
+}
