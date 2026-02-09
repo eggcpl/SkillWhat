@@ -886,8 +886,7 @@ function hideTooltip() {
 
 /* ---------------- LOAD ---------------- */
 if (loadBtn) {
-  loadBtn.addEventListener("pointerdown", () => {
-    console.log("LOAD TOUCHED");   // 👈 METE ESTA LINHA AQUI
+  loadBtn.addEventListener("click", () => {
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
 
@@ -1828,7 +1827,7 @@ antiBtn.addEventListener("click", () => {
 
 
   if (gameOkBtn) {
-    gameOkBtn.addEventListener("pointerdown", () => {
+    gameOkBtn.addEventListener("click", () => {
       const value = parseInt(gameInput.value, 10);
       if (isNaN(value) || value < 0) return;
       if (gamesPlayedEl) gamesPlayedEl.textContent = value;
@@ -1962,10 +1961,10 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.6.3 - 3:59 - February.8.2026";
+  v.textContent = "v1.6.1 - 3:59 - February.8.2026";
 
   u.innerHTML = `
-    <li>Add Anti Social & Short Lived Icon</li> 
+    <li>Add AntiSocial & Short Lived Icon</li> 
     <li>Visual update gear</li>
     <li>Long Lived icon added</li>
     <li>info png fix</li>
@@ -2007,7 +2006,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!clearBtn || !input) return;
 
-  clearBtn.addEventListener("pointerdown", () => {
+  clearBtn.addEventListener("click", () => {
     input.value = "";
     input.focus();
   });
