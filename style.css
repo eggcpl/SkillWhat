@@ -229,7 +229,7 @@ body {
     left: 174px;
     top: -33px;
     width: 40px;
-    height: 220px;     /* ajusta mais tarde */
+    height: 200px;     /* ajusta mais tarde */
     padding: 10px;       
     border: none;
     resize: none;
@@ -237,6 +237,7 @@ body {
     outline: none;
     background: #e5dfcc;
     border-radius: 21px 0px 0px 21px;
+    pointer-events: none;
 }
 
 /* Scroll bonito para a input-box */
@@ -283,6 +284,7 @@ body {
     background: #f56e0eff;
     transition: 0.2s ease; 
     z-index: 999999;
+    touch-action: manipulation; /* 🔥 MOBILE */
 }
 .load-btn:hover {
     background: #edeec0ff; /* a cor que pediste */

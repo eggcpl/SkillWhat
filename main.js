@@ -1961,7 +1961,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.7.1 - 3:59 - February.8.2026";
+  v.textContent = "v1.8.1 - 3:59 - February.8.2026";
 
   u.innerHTML = `
     <li>Add AntiSocial & Short Lived Icon</li> 
