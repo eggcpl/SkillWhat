@@ -1609,3 +1609,6 @@ pointer-events: auto;
   display: none;
 }
 
+button {
+  touch-action: manipulation;
+}
