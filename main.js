@@ -343,7 +343,8 @@ function updateTotals() {
     const lines = txt
   .replace(/\r/g, "\n")
   .split("\n")
-        .map(l => l.trim())
+        .map(l => l.replace(/[\u00A0\u202F]/g, " ").trim())
+
         .filter(l => l.length > 0); // remove vazios
 
     const skillNames = [
@@ -1977,7 +1978,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.14.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.1000.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
