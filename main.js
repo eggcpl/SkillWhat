@@ -70,6 +70,21 @@ const maxBtn = document.querySelector(".max-btn");
 const loadBtn = document.getElementById("load-button");
 const skillInput = document.getElementById("skill-input");
 
+let lastValue = "";
+
+setInterval(() => {
+  if (!skillInput || !loadBtn) return;
+
+  const v = skillInput.value.trim();
+
+if (v && v !== lastValue && v.length > 50) {
+  loadBtn.click();
+  lastValue = v;
+}
+
+}, 300);
+
+
 let autoLoadTimer = null;
 
 function mobileSafeAutoLoad() {
@@ -1962,7 +1977,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.10.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.14.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
