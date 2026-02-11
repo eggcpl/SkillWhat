@@ -72,18 +72,12 @@ const skillInput = document.getElementById("skill-input");
 
 let autoLoadTimer = null;
 
-if (skillInput && loadBtn) {
-  skillInput.addEventListener("input", () => {
-    clearTimeout(autoLoadTimer);
-
-    autoLoadTimer = setTimeout(() => {
-      const txt = skillInput.value.trim();
-      if (txt.length > 0) {
-        loadBtn.click();
-      }
-    }, 200);
-  });
-}
+skillInput.addEventListener("change", () => {
+  const txt = skillInput.value.trim();
+  if (txt.length > 0) {
+    loadBtn.click();
+  }
+});
 
 
 const START_DATE = new Date(2025, 3, 28);
