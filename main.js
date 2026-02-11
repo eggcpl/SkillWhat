@@ -78,6 +78,9 @@ skillInput.addEventListener("change", () => {
     loadBtn.click();
   }
 });
+skillInput.addEventListener("paste", () => {
+  requestAnimationFrame(() => loadBtn.click());
+});
 
 
 const START_DATE = new Date(2025, 3, 28);
