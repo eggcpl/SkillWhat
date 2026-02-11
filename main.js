@@ -1011,6 +1011,12 @@ if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
     const loadText = document.getElementById("skill-input").value.trim();
     const data = parseCardText(loadText);
     alert(
+  loadText
+    .split("\n")
+    .map(l => JSON.stringify(l))
+    .join("\n")
+);
+    alert(
   "SKILLS FOUND: " + data.skills.length +
   "\nNAMES: " + data.skills.map(s => s.name).join(", ")
 );
@@ -1994,7 +2000,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.1050.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.1060.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
