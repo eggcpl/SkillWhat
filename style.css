@@ -6,14 +6,6 @@
     -moz-user-select: none;
     -ms-user-select: none;
 }
-#skill-input {
-  user-select: text !important;
-  -webkit-user-select: text !important;
-  -moz-user-select: text !important;
-  -ms-user-select: text !important;
-
-  pointer-events: auto !important;
-}
 * {
     font-family: "Poppins", sans-serif;
 }
@@ -290,7 +282,6 @@ body {
     cursor: pointer;
     background: #f56e0eff;
     transition: 0.2s ease; 
-    display: none;
 }
 .load-btn:hover {
     background: #edeec0ff; /* a cor que pediste */
@@ -1620,17 +1611,3 @@ pointer-events: auto;
   display: none;
 }
 
-.paste-load-btn {
-  position: absolute;
-  left: 168px;
-  top: 230px;
-  width: 60px;
-  height: 26px;
-  border-radius: 10px;
-  border: none;
-  background: #f56e0e;
-  color: #000;
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-}

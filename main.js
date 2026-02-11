@@ -69,7 +69,9 @@ const moraleBtn = document.querySelector(".morale-btn");
 const maxBtn = document.querySelector(".max-btn");
 const loadBtn = document.getElementById("load-button");
 const skillInput = document.getElementById("skill-input");
-
+if (loadBtn) {
+  loadBtn.addEventListener("click", doLoad);
+}
 let lastValue = "";
 
 setInterval(() => {
@@ -919,8 +921,7 @@ function hideTooltip() {
 }
 
 /* ---------------- LOAD ---------------- */
-if (loadBtn) {
-  loadBtn.addEventListener("click", () => {
+function doLoad() {
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
 
@@ -1002,6 +1003,7 @@ if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
 
     // CHECK IF LOAD INPUT IS EMPTY -> RESTORE INITIAL STATE (option A)
     const loadText = document.getElementById("skill-input").value.trim();
+    const data = parseCardText(loadText);
     missingPopupOpen = false;
     if (loadText.length === 0) {
 
@@ -1030,7 +1032,10 @@ loadedAge = "15yo (day 1)";
 
 
     // NORMAL LOAD (text present)
-    const data = parseCardText(loadText);
+    alert(
+  "TEXT LEN: " + loadText.length +
+  "\nLINES:\n" + loadText.replace(/\r/g,"\n").split("\n").join(" | ")
+);
 
     const nameEl = document.querySelector(".player-name");
     const ageEl = document.querySelector(".player-age");
@@ -1062,7 +1067,7 @@ loadedAge = data.playerAge;
     computeMaxCareerHeart();
     renderSkills();
     renderMiniGear();
-  });
+  
 }
 
 /* ---------------- HEART / MORALE / MAX ---------------- */
@@ -1978,7 +1983,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.1000.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.1020.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
