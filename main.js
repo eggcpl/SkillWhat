@@ -69,38 +69,21 @@ const moraleBtn = document.querySelector(".morale-btn");
 const maxBtn = document.querySelector(".max-btn");
 const loadBtn = document.getElementById("load-button");
 const skillInput = document.getElementById("skill-input");
-if (loadBtn) {
-  loadBtn.addEventListener("click", doLoad);
-}
-let lastValue = "";
-
-setInterval(() => {
-  if (!skillInput || !loadBtn) return;
-
-  const v = skillInput.value.trim();
-
-if (v && v !== lastValue && v.length > 50) {
-  loadBtn.click();
-  lastValue = v;
-}
-
-}, 300);
-
 
 let autoLoadTimer = null;
 
-function mobileSafeAutoLoad() {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
+if (skillInput && loadBtn) {
+  skillInput.addEventListener("input", () => {
+    clearTimeout(autoLoadTimer);
+
+    autoLoadTimer = setTimeout(() => {
       const txt = skillInput.value.trim();
-      if (txt.length > 0) loadBtn.click();
-    });
+      if (txt.length > 0) {
+        loadBtn.click();
+      }
+    }, 200);
   });
 }
-
-skillInput.addEventListener("paste", mobileSafeAutoLoad);
-skillInput.addEventListener("change", mobileSafeAutoLoad);
-
 
 
 const START_DATE = new Date(2025, 3, 28);
@@ -343,16 +326,8 @@ function updateTotals() {
 
     function parseCardText(txt) {
     const lines = txt
-  .replace(/\r/g, "\n")
-  .split("\n")
-        .map(l =>
-  l
-    .replace(/[\u00A0\u202F\u200E\u200F]/g, " ")
-    .replace(/[^\x20-\x7E]/g, "")
-    .trim()
-)
-
-
+        .split("\n")
+        .map(l => l.trim())
         .filter(l => l.length > 0); // remove vazios
 
     const skillNames = [
@@ -364,6 +339,21 @@ function updateTotals() {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+
+        const MOBILE_ALIAS = {
+  AIM: "Aim",
+  HND: "Handling",
+  QCK: "Quickness",
+  DET: "Determination",
+  AWA: "Awareness",
+  TMP: "Teamplay",
+  GMS: "Gamesense",
+  MOV: "Movement"
+};
+
+const normalizedLine =
+  MOBILE_ALIAS[line] || line;
+
 
         // -----------------------------------
         // 1) FORMATO INLINE: "Skill 42/?"
@@ -385,8 +375,8 @@ function updateTotals() {
         // 42
         // /93   ou   / ?   ou   ?
         // -----------------------------------
-        if (skillNames.includes(line)) {
-            const name = line;
+        if (skillNames.includes(normalizedLine)) {
+            const name = normalizedLine;
 
             const valLine = lines[i + 1] || "";
             const maxLine = lines[i + 2] || "";
@@ -927,7 +917,8 @@ function hideTooltip() {
 }
 
 /* ---------------- LOAD ---------------- */
-function doLoad() {
+if (loadBtn) {
+  loadBtn.addEventListener("click", () => {
 extendedCareer = false;
 const careerBtn = document.getElementById("career-plus-btn");
 
@@ -1009,18 +1000,6 @@ if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
 
     // CHECK IF LOAD INPUT IS EMPTY -> RESTORE INITIAL STATE (option A)
     const loadText = document.getElementById("skill-input").value.trim();
-    const data = parseCardText(loadText);
-    alert(
-  loadText
-    .split("\n")
-    .map(l => JSON.stringify(l))
-    .join("\n")
-);
-    alert(
-  "SKILLS FOUND: " + data.skills.length +
-  "\nNAMES: " + data.skills.map(s => s.name).join(", ")
-);
-
     missingPopupOpen = false;
     if (loadText.length === 0) {
 
@@ -1049,10 +1028,7 @@ loadedAge = "15yo (day 1)";
 
 
     // NORMAL LOAD (text present)
-    alert(
-  "TEXT LEN: " + loadText.length +
-  "\nLINES:\n" + loadText.replace(/\r/g,"\n").split("\n").join(" | ")
-);
+    const data = parseCardText(loadText);
 
     const nameEl = document.querySelector(".player-name");
     const ageEl = document.querySelector(".player-age");
@@ -1084,7 +1060,7 @@ loadedAge = data.playerAge;
     computeMaxCareerHeart();
     renderSkills();
     renderMiniGear();
-  
+  });
 }
 
 /* ---------------- HEART / MORALE / MAX ---------------- */
@@ -2000,7 +1976,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.1060.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.9.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 

@@ -282,6 +282,7 @@ body {
     cursor: pointer;
     background: #f56e0eff;
     transition: 0.2s ease; 
+    display: none;
 }
 .load-btn:hover {
     background: #edeec0ff; /* a cor que pediste */
