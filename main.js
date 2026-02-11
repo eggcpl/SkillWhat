@@ -72,15 +72,18 @@ const skillInput = document.getElementById("skill-input");
 
 let autoLoadTimer = null;
 
-skillInput.addEventListener("change", () => {
-  const txt = skillInput.value.trim();
-  if (txt.length > 0) {
-    loadBtn.click();
-  }
-});
-skillInput.addEventListener("paste", () => {
-  requestAnimationFrame(() => loadBtn.click());
-});
+function mobileSafeAutoLoad() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const txt = skillInput.value.trim();
+      if (txt.length > 0) loadBtn.click();
+    });
+  });
+}
+
+skillInput.addEventListener("paste", mobileSafeAutoLoad);
+skillInput.addEventListener("change", mobileSafeAutoLoad);
+
 
 
 const START_DATE = new Date(2025, 3, 28);
@@ -1958,7 +1961,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.9.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.10.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
