@@ -76,31 +76,35 @@ if (skillInput && loadBtn) {
 
   let alreadyLoaded = false;
 
-function tryAutoLoad() {
-  const txt = skillInput.value.trim();
+  function tryAutoLoad() {
+    const txt = skillInput.value.trim();
 
-  // rearmar quando textarea estiver vazio
-  if (txt.length === 0) {
-    alreadyLoaded = false;
-    return;
-  }
+    if (txt.length === 0) {
+      alreadyLoaded = false;
+      return;
+    }
 
-  // só carregar uma vez por texto colado
-  if (txt.length > 20 && !alreadyLoaded) {
-    alreadyLoaded = true;
-    loadBtn.click();
+    if (txt.length > 20 && !alreadyLoaded) {
+      alreadyLoaded = true;
+      loadBtn.click();
+    }
   }
-}
 
   skillInput.addEventListener("input", tryAutoLoad);
   skillInput.addEventListener("change", tryAutoLoad);
   skillInput.addEventListener("blur", tryAutoLoad);
 
-  // fallback Safari iOS
   setInterval(() => {
     tryAutoLoad();
   }, 500);
+
+  // ===== iOS SAFARI HARD FIX =====
+  setInterval(() => {
+    skillInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }, 300);
+
 }
+
 
 
 
@@ -1984,7 +1988,7 @@ window.addEventListener("load", () => {
   v.textContent = "v1.9.4 - 3:03 - February.9.2026";
 
   u.innerHTML = `
-    bug fix10?
+    bug fix11?
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
     <li>Fixed export png - Text wrapping issue</li> 
     <li>Add AntiSocial & Short Lived Icon</li> 
