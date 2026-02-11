@@ -345,7 +345,13 @@ function updateTotals() {
     const lines = txt
   .replace(/\r/g, "\n")
   .split("\n")
-        .map(l => l.replace(/[\u00A0\u202F]/g, " ").trim())
+        .map(l =>
+  l
+    .replace(/[\u00A0\u202F\u200E\u200F]/g, " ")
+    .replace(/[^\x20-\x7E]/g, "")
+    .trim()
+)
+
 
         .filter(l => l.length > 0); // remove vazios
 
@@ -1988,7 +1994,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.1030.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.1050.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
