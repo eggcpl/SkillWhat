@@ -326,7 +326,8 @@ function updateTotals() {
 
     function parseCardText(txt) {
     const lines = txt
-        .split("\n")
+  .replace(/\r/g, "\n")
+  .split("\n")
         .map(l => l.trim())
         .filter(l => l.length > 0); // remove vazios
 
