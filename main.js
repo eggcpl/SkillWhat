@@ -1004,6 +1004,11 @@ if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
     // CHECK IF LOAD INPUT IS EMPTY -> RESTORE INITIAL STATE (option A)
     const loadText = document.getElementById("skill-input").value.trim();
     const data = parseCardText(loadText);
+    alert(
+  "SKILLS FOUND: " + data.skills.length +
+  "\nNAMES: " + data.skills.map(s => s.name).join(", ")
+);
+
     missingPopupOpen = false;
     if (loadText.length === 0) {
 
@@ -1983,7 +1988,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.1020.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.1030.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
