@@ -73,40 +73,17 @@ const skillInput = document.getElementById("skill-input");
 let autoLoadTimer = null;
 
 if (skillInput && loadBtn) {
+  skillInput.addEventListener("input", () => {
+    clearTimeout(autoLoadTimer);
 
-  let alreadyLoaded = false;
-
-  function tryAutoLoad() {
-    const txt = skillInput.value.trim();
-
-    if (txt.length === 0) {
-      alreadyLoaded = false;
-      return;
-    }
-
-    if (txt.length > 20 && !alreadyLoaded) {
-      alreadyLoaded = true;
-      loadBtn.click();
-    }
-  }
-
-  skillInput.addEventListener("input", tryAutoLoad);
-  skillInput.addEventListener("change", tryAutoLoad);
-  skillInput.addEventListener("blur", tryAutoLoad);
-
-  setInterval(() => {
-    tryAutoLoad();
-  }, 500);
-
-  // ===== iOS SAFARI HARD FIX =====
-  setInterval(() => {
-    skillInput.dispatchEvent(new Event("input", { bubbles: true }));
-  }, 300);
-
+    autoLoadTimer = setTimeout(() => {
+      const txt = skillInput.value.trim();
+      if (txt.length > 0) {
+        loadBtn.click();
+      }
+    }, 200);
+  });
 }
-
-
-
 
 
 const START_DATE = new Date(2025, 3, 28);
@@ -1060,7 +1037,6 @@ if (incomplete.length > 0 && !missingPopupOpen) {
 loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
 loadedName = data.playerName;
 loadedAge = data.playerAge;
-skillInput.value = "";
     // ensure UI and calculations updated
     recomputeEquipmentBoosts();
     renderAllEquipmentUI();
@@ -1985,10 +1961,9 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.9.4 - 3:03 - February.9.2026";
+  v.textContent = "v1.9.3 - 3:03 - February.9.2026";
 
   u.innerHTML = `
-    bug fix11?
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
     <li>Fixed export png - Text wrapping issue</li> 
     <li>Add AntiSocial & Short Lived Icon</li> 
