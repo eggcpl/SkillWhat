@@ -74,21 +74,34 @@ let autoLoadTimer = null;
 
 if (skillInput && loadBtn) {
 
-  function triggerAutoLoad() {
-    clearTimeout(autoLoadTimer);
+  let alreadyLoaded = false;
 
-    autoLoadTimer = setTimeout(() => {
-      const txt = skillInput.value.trim();
-      if (txt.length > 0) {
-        loadBtn.click();
-      }
-    }, 200);
+function tryAutoLoad() {
+  const txt = skillInput.value.trim();
+
+  // rearmar quando textarea estiver vazio
+  if (txt.length === 0) {
+    alreadyLoaded = false;
+    return;
   }
 
-  ["input", "change", "keyup", "paste"].forEach(evt => {
-    skillInput.addEventListener(evt, triggerAutoLoad);
-  });
+  // só carregar uma vez por texto colado
+  if (txt.length > 20 && !alreadyLoaded) {
+    alreadyLoaded = true;
+    loadBtn.click();
+  }
 }
+
+  skillInput.addEventListener("input", tryAutoLoad);
+  skillInput.addEventListener("change", tryAutoLoad);
+  skillInput.addEventListener("blur", tryAutoLoad);
+
+  // fallback Safari iOS
+  setInterval(() => {
+    tryAutoLoad();
+  }, 500);
+}
+
 
 
 
@@ -1043,6 +1056,7 @@ if (incomplete.length > 0 && !missingPopupOpen) {
 loadedSkillsBackup = JSON.parse(JSON.stringify(skills));
 loadedName = data.playerName;
 loadedAge = data.playerAge;
+skillInput.value = "";
     // ensure UI and calculations updated
     recomputeEquipmentBoosts();
     renderAllEquipmentUI();
@@ -1970,7 +1984,7 @@ window.addEventListener("load", () => {
   v.textContent = "v1.9.4 - 3:03 - February.9.2026";
 
   u.innerHTML = `
-    bug fix?
+    bug fix10?
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
     <li>Fixed export png - Text wrapping issue</li> 
     <li>Add AntiSocial & Short Lived Icon</li> 
