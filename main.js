@@ -1976,9 +1976,10 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.9.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.10.2 - 3:12 - February.9.2026";
 
   u.innerHTML = `
+    <li>Mobile Final Fix</li> 
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
     <li>Fixed export png - Text wrapping issue</li> 
     <li>Add AntiSocial & Short Lived Icon</li> 
