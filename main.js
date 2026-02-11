@@ -73,7 +73,8 @@ const skillInput = document.getElementById("skill-input");
 let autoLoadTimer = null;
 
 if (skillInput && loadBtn) {
-  skillInput.addEventListener("input", () => {
+
+  function triggerAutoLoad() {
     clearTimeout(autoLoadTimer);
 
     autoLoadTimer = setTimeout(() => {
@@ -82,8 +83,13 @@ if (skillInput && loadBtn) {
         loadBtn.click();
       }
     }, 200);
+  }
+
+  ["input", "change", "keyup", "paste"].forEach(evt => {
+    skillInput.addEventListener(evt, triggerAutoLoad);
   });
 }
+
 
 
 const START_DATE = new Date(2025, 3, 28);
@@ -1756,22 +1762,7 @@ let loyalActive = false;
 let antisocialActive = false;
 let originalGamesBeforeModifier = null;
 
-function applyGameModifier(multiplier) {
-  const gamesPlayedEl = document.getElementById("games-played");
-  let games = parseInt(gamesPlayedEl.textContent, 10) || 0;
 
-  if (originalGamesBeforeModifier === null) {
-    originalGamesBeforeModifier = games;
-  }
-
-  const modified = Math.floor(originalGamesBeforeModifier * multiplier);
-  gamesPlayedEl.textContent = modified;
-
-
-  updateHeartsBasedOnGames(modified);
-  computeMaxCareerHeart();
-  updateGamesButtonState();
-}
 
 /* LOYAL */
 gameImgBtn.addEventListener("click", () => {
@@ -1782,46 +1773,44 @@ gameImgBtn.addEventListener("click", () => {
     antiBtn.classList.remove("active");
 
     gameImgBtn.classList.add("active");
-    document.getElementById("loyal-status").textContent = "YES";
-
-    applyGameModifier(0.75);
+    loyalStatusEl.textContent = "YES";
   } else {
     gameImgBtn.classList.remove("active");
-    document.getElementById("loyal-status").textContent = "NO";
-
-    document.getElementById("games-played").textContent = originalGamesBeforeModifier || 0;
-    originalGamesBeforeModifier = null;
-
-    updateHeartRequirementLabels(false);
-    updateHeartsBasedOnGames(0);
-    updateGamesButtonState();
+    loyalStatusEl.textContent = "NO";
   }
+
+  const games =
+    parseInt(document.getElementById("games-played")?.textContent, 10) || 0;
+
+  updateHeartRequirementLabels();
+  updateHeartsBasedOnGames(games);
+  computeMaxCareerHeart();
+  updateGamesButtonState();
 });
 
-/* ANTI SOCIAL */
+
 antiBtn.addEventListener("click", () => {
   antisocialActive = !antisocialActive;
 
   if (antisocialActive) {
     loyalActive = false;
     gameImgBtn.classList.remove("active");
-    document.getElementById("loyal-status").textContent = "NO";
+    loyalStatusEl.textContent = "NO";
 
     antiBtn.classList.add("active");
-    applyGameModifier(1.25);
   } else {
     antiBtn.classList.remove("active");
-
-    document.getElementById("games-played").textContent = originalGamesBeforeModifier || 0;
-    originalGamesBeforeModifier = null;
-
-    updateHeartRequirementLabels(false);
-    updateHeartsBasedOnGames(0);
   }
 
+  const games =
+    parseInt(document.getElementById("games-played")?.textContent, 10) || 0;
+
+  updateHeartRequirementLabels();
+  updateHeartsBasedOnGames(games);
   computeMaxCareerHeart();
   updateGamesButtonState();
 });
+
 
 
 
@@ -1978,9 +1967,10 @@ window.addEventListener("load", () => {
     return;
   }
 
-  v.textContent = "v1.9.3 - 3:03 - February.9.2026";
+  v.textContent = "v1.9.4 - 3:03 - February.9.2026";
 
   u.innerHTML = `
+    bug fix?
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
     <li>Fixed export png - Text wrapping issue</li> 
     <li>Add AntiSocial & Short Lived Icon</li> 
