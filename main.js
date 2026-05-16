@@ -86,7 +86,7 @@ if (skillInput && loadBtn) {
 }
 
 
-const START_DATE = new Date(2025, 3, 28);
+const START_DATE = new Date(2025, 3, 29);
 const SEASON_LENGTH = 35;
 
 function whenGamesReached(currentSeason, currentDay, gamesAlready, gamesRequired) {
@@ -163,7 +163,8 @@ const heartBoosts = {
   2: 1,     // Medium
   3: 3,     // Big
   4: 5,     // Gold
-  5: 8      // Platinum
+  5: 8,      // Platinum
+  6: 4, // Fire Heart
 };
 const moraleBoosts = { 0: 0, 1: 1, 2: 2, 3: 3 };
 
@@ -1066,7 +1067,7 @@ loadedAge = data.playerAge;
 /* ---------------- HEART / MORALE / MAX ---------------- */
 if (heartBtn) {
   heartBtn.addEventListener("click", () => {
-    heartState = (heartState + 1) % 6;
+    heartState = (heartState + 1) % 7;
     heartBtn.className = "action-btn heart-grey-btn";
     if (heartState > 0) heartBtn.classList.add(`heart-active-${heartState}`);
     renderSkills();
