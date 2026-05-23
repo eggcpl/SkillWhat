@@ -645,16 +645,26 @@ if (finalVal >= 100) {
         cur.style.color = "#ffffffff";
     }
 
-    const mx = document.createElement("span");
-    mx.className = "skill-max";
-    mx.textContent = "/" + s.max;
+const mx = document.createElement("span");
+mx.className = "skill-max";
+mx.textContent = "/" + s.max;
 
-    val.appendChild(cur);
-    val.appendChild(mx);
+const total = document.createElement("span");
+total.className = "skill-total";
 
-    row.appendChild(name);
-    row.appendChild(bar);
-    row.appendChild(val);
+if (v.final >= 100) {
+  total.textContent = Math.floor(v.final);
+} else {
+  total.textContent = "";
+}
+
+val.appendChild(cur);
+val.appendChild(mx);
+val.appendChild(total);
+
+row.appendChild(name);
+row.appendChild(bar);
+row.appendChild(val);
 
 bar.addEventListener("mouseenter", e => {
   showTooltipForSkill(s, e);
@@ -2367,3 +2377,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   updateLeadershipUI();
 });
+const totalSkillBox = document.querySelector(".total-skill-box");
+const totalTooltip = document.getElementById("total-tooltip");
+
+if (totalSkillBox && totalTooltip) {
+
+  totalSkillBox.addEventListener("mousemove", e => {
+
+    let baseTotal = 0;
+    let limitTotal = 0;
+
+    skills.forEach(s => {
+      baseTotal += maxMode ? s.max : s.value;
+      limitTotal += s.max;
+    });
+
+    document.getElementById("tt-base").textContent = baseTotal;
+    document.getElementById("tt-limit").textContent = limitTotal;
+
+    document.getElementById("tt-leader").textContent =
+      "+" + getLeadershipBoost().toFixed(1) + "%";
+
+    document.getElementById("tt-heart").textContent =
+      "+" + heartBoosts[heartState] + "%";
+
+    totalTooltip.style.left = e.pageX + 15 + "px";
+    totalTooltip.style.top = e.pageY + 15 + "px";
+
+    totalTooltip.classList.add("visible");
+    totalTooltip.classList.remove("hidden");
+  });
+
+  totalSkillBox.addEventListener("mouseleave", () => {
+    totalTooltip.classList.remove("visible");
+    totalTooltip.classList.add("hidden");
+  });
+
+}

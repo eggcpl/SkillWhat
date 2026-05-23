@@ -89,6 +89,62 @@ body {
      font-size: 14px;
 }
 
+.total-tooltip {
+  position: fixed;
+
+  background: #1f1f1f;
+  color: white;
+
+  padding: 12px 14px;
+
+  border-radius: 5px;
+  border: 2px solid #8e8e8e;
+
+  z-index: 9999;
+
+  min-width: 140px;
+  max-width: 220px;
+
+  pointer-events: none;
+
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.35);
+
+  font-size: 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  opacity: 0;
+
+  transition: opacity .12s ease-in-out;
+}
+
+.total-tooltip.visible {
+  opacity: 1;
+}
+
+.total-tooltip.hidden {
+  opacity: 0;
+}
+
+.tt-columns {
+  display: flex;
+  gap: 28px;
+}
+
+.tt-title {
+  font-size: 14px;
+  font-weight: 700;
+
+  margin-bottom: 4px;
+}
+
+.tt-col {
+  display: flex;
+  flex-direction: column;
+
+ 
+}
 
 /* Lista de skills reduzida */
 .skills-list {
@@ -108,20 +164,26 @@ body {
     text-align: right;         /* alinha texto à direita */
     font-size: 15px;
     color: #fff;
-    padding-right: 10px;       /* dá espaço bonito antes da barra */
-    transform: none !important;/* remove alinhamentos errados */
+    padding-right: 00px;       /* dá espaço bonito antes da barra */
+    margin-right: 20px;
+     position: relative;
+    left: -10px;
+    top: 0px;
+
 }
 
 
 .skill-bar {
     position: relative;
+    left: -10px;
+    top: 0px;
     width: 450px;
     transform: translateX(20%);
     height: 10px;
     background: #2a2a2a;
     border-radius: 999px;
     overflow: visible;
-    margin-left: -80px;
+    margin-left: -100px;
 }
 
 .skill-limit {
@@ -130,6 +192,20 @@ body {
     background: #3f4341;
     border-radius: 999px 0 0 999px;  /* ← arredondado à esquerda */
     z-index: 1;
+    
+}
+
+.skill-total {
+    width: 36px;
+
+    margin-left: -8px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    color: #edeec0;
+
+    text-align: left;
 }
 
 .skill-fill {
@@ -174,13 +250,17 @@ body {
 }
 
 .skill-value {
-    margin-left: 88px;
-    gap: 1px;
-    color: #9c9c9c;
-    display: flex;           /* 👈 obrigatório */
-    width: 80px;             /* 👈 obrigatório */
-    justify-content: center; 
-    text-align: center;
+    margin-left: 80px;
+
+    display: grid;
+    grid-template-columns: 34px 46px 36px;
+
+    align-items: center;
+
+    gap: 0px;
+
+    width: 120px;
+color: #ffffff;
     margin-top: -2px;
 }
 
@@ -188,7 +268,9 @@ body {
 .skill-current {
     font-weight: 600;
     font-size: 15px;
-    width: 40px;
+
+    width: 34px;
+
     text-align: right;
 }
 
@@ -196,7 +278,9 @@ body {
     font-weight: 600;
     color: #5f6d5d;
     font-size: 14px;
-    width: 40px;
+
+    width: 46px;
+    margin-top: 0px;
     text-align: left;
 }
 
@@ -379,7 +463,7 @@ body {
 
 .tooltip-title-row span {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 /* Conteúdo em 2 colunas alinhadas */
