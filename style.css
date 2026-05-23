@@ -380,23 +380,22 @@ color: #ffffff;
 }
 
 .player-age {
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 500;
     color: #bcbcbc;  /* cinzento suave */
 }
 
-.player-dot {
-    color: #bcbcbc;
-    font-size: 18px;
-}
+
 .player-header {
     white-space: nowrap;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: flex-start;
-    gap: 12px;
-    margin-bottom: 15px;
+    gap: 0px;
+    margin-bottom: 10px;
     margin-left: 35px;
+    margin-top: -10px;
 }
 .player-name {
   white-space: nowrap;
@@ -1475,9 +1474,6 @@ player-header,
   flex-wrap: nowrap;
 }
 
-.player-age {
-  white-space: nowrap;
-}
 
 
 .export-icon {
