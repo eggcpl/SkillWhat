@@ -26,7 +26,7 @@ const boostTooltip = document.getElementById("boost-tooltip");
 function showBoostTooltip(e, finalValue) {
   if (!boostTooltip) return;
 
-const capped = Math.min(120, finalValue);
+const capped = Math.min(110, finalValue);
 
   boostTooltip.textContent = capped;
   boostTooltip.style.left = e.pageX + 12 + "px";
@@ -86,7 +86,7 @@ if (skillInput && loadBtn) {
 }
 
 
-const START_DATE = new Date(2025, 3, 29);
+const START_DATE = new Date(Date.UTC(2025, 3, 28));
 const SEASON_LENGTH = 35;
 
 function whenGamesReached(currentSeason, currentDay, gamesAlready, gamesRequired) {
@@ -185,13 +185,50 @@ function updateBoostLabels() {
 
 
 const equipped = { mousepad: null, mouse: null, keyboard: null, headset: null };
+
+const bonusLimit = {
+  mousepad: null,
+  mouse: null,
+  keyboard: null,
+  headset: null
+};
+const bonusAmount = {
+  mousepad: 0,
+  mouse: 0,
+  keyboard: 0,
+  headset: 0
+};
+
+let leadership = 0;
+
+function getLeadershipBoost() {
+  return leadership * 0.2;
+}
+let updateLeadershipUI = null;
+
+function resetLeadership() {
+  leadership = 0;
+
+  if (updateLeadershipUI) {
+    updateLeadershipUI();
+  } else {
+    renderSkills();
+  }
+}
 let equipmentBoosts = {};
 
 /* ---------------- DATE & CLOCK ---------------- */
 function calculateGameDate() {
 
   const now = new Date();
-  const diffMs = now - START_DATE;
+const nowUTC = new Date(
+  Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate()
+  )
+);
+  const diffMs = nowUTC - START_DATE;
   const diffDays = Math.floor(diffMs / 86400000);
   if (diffDays < 0) return { season: 1, day: 1 };
   return {
@@ -291,7 +328,10 @@ for (let row = 0; row < 4; row++) {
 function computeSkillValues(s) {
   const equipBoost = equipmentBoosts[s.name] || 0;
   const base = maxMode ? s.max : s.value;
-let pctTotal = heartBoosts[heartState] + moraleBoosts[moraleState];
+let pctTotal =
+  heartBoosts[heartState] +
+  moraleBoosts[moraleState] +
+  getLeadershipBoost();
 
 
 
@@ -697,8 +737,8 @@ boostWrap.addEventListener("mouseleave", hideBoostTooltip);
         const boostFill = document.createElement("div");
         boostFill.className = "skill-boost-fill";
 
-        const hiddenBoost = Math.max(0, Math.min(v.final - 100, 20));
-        const pct = (hiddenBoost / 20) * 100;
+        const hiddenBoost = Math.max(0, Math.min(v.final - 100, 10));  
+              const pct = (hiddenBoost / 10) * 100;
         boostFill.style.width = pct + "%";
 
         boostWrap.appendChild(boostFill);
@@ -901,9 +941,18 @@ function showTooltipForSkill(s, e) {
   set("tooltip-limit", s.max);
   set("tooltip-boost", v.pctBoost.toFixed(2));
   set("tooltip-total", v.final.toFixed(2));
-  set("tooltip-heart", "+" + heartBoosts[heartState] + "%");
-  set("tooltip-morale", "+" + moraleBoosts[moraleState] + "%");
-  set("tooltip-gear", "+" + (v.equipBoost || 0));
+set("tooltip-heart", "+" + heartBoosts[heartState] + "%");
+set("tooltip-morale", "+" + moraleBoosts[moraleState] + "%");
+
+const leaderBoost = getLeadershipBoost();
+
+if (leaderBoost > 0) {
+  set("tooltip-leader", "+" + leaderBoost.toFixed(1) + "%");
+} else {
+  set("tooltip-leader", "");
+}
+
+set("tooltip-gear", "+" + (v.equipBoost || 0));
 
   if (!tooltip) return;
   tooltip.style.left = e.pageX + 15 + "px";
@@ -945,10 +994,12 @@ if (antiBtn) antiBtn.classList.remove("active");
 
     // RESET GEAR
     Object.keys(equipped).forEach(k => equipped[k] = null);
+    Object.keys(bonusLimit).forEach(k => bonusLimit[k] = null);
     updateBoostLabels();
     recomputeEquipmentBoosts();
     renderAllEquipmentUI();
     updateGearButtonState();
+    resetLeadership();
 
     // RESET POPUPS
     gearLocked = false;
@@ -1118,10 +1169,10 @@ const GEAR_ICONS = {
 /* ---------------- EQUIPMENT DATA & UI ---------------- */
 const EQUIPMENT = {
   mousepad: [
-    { name: "AJ Pad", boosts: { Handling: 2, Quickness: 1 }, tokens: "H2 Q1" },
+    { name: "AJ Pad", boosts: { Handling: 3, Quickness: 1 }, tokens: "H3 Q1" },
     { name: "Noctron", boosts: { Aim: 1, Quickness: 2 }, tokens: "A1 Q2" },
     { name: "Citus", boosts: { Aim: 1, Handling: 1, Quickness: 1 }, tokens: "A1 H1 Q1" },
-    { name: "Armageddon", boosts: { Aim: 1, Handling: 2 }, tokens: "A1 H2" }
+    { name: "Armageddon", boosts: { Aim: 1, Handling: 3 }, tokens: "A1 H3" }
   ],
   mouse: [
     { name: "Aquila Fly", boosts: { Aim: 2, Handling: 1 }, tokens: "A2 H1" },
@@ -1130,16 +1181,16 @@ const EQUIPMENT = {
     { name: "Cyborg", boosts: { Handling: 1, Quickness: 2 }, tokens: "H1 Q2" }
   ],
   keyboard: [
-    { name: "Mintaka", boosts: { Determination: 1, Movement: 2 }, tokens: "D1 M2" },
+    { name: "Mintaka", boosts: { Determination: 2, Movement: 2 }, tokens: "D2 M2" },
     { name: "Quasar RGB", boosts: { Determination: 3 }, tokens: "D3" },
     { name: "Alnitak", boosts: { Determination: 3, Movement: 1 }, tokens: "D3 M1" },
-    { name: "Pulsar", boosts: { Movement: 3 }, tokens: "M3" }
+    { name: "Pulsar", boosts: { Movement: 4, Determination: 1 }, tokens: "M4 D1 " }
   ],
   headset: [
-    { name: "Pentagon", boosts: { Teamplay: 1, Gamesense: 2 }, tokens: "T1 G2" },
+    { name: "Pentagon", boosts: { Teamplay: 1, Gamesense: 2, Awareness: 1 }, tokens: "T1 G2 Aw1" },
     { name: "Enigma", boosts: { Awareness: 2, Teamplay: 1 }, tokens: "Aw2 T1" },
     { name: "Gemini", boosts: { Awareness: 2, Gamesense: 1 }, tokens: "Aw2 G1" },
-    { name: "Singularity", boosts: { Awareness: 1, Teamplay: 1, Gamesense: 1 }, tokens: "Aw1 T1 G1" }
+    { name: "Singularity", boosts: { Awareness: 1, Teamplay: 2, Gamesense: 1 }, tokens: "Aw1 T2 G1" }
   ]
 };
 
@@ -1152,10 +1203,12 @@ function renderCategory(id, items) {
 
   const cat = id.replace("gear-", "");
 
+  // ICON LEFT
   const img = document.createElement("img");
   img.src = GEAR_ICONS[cat];
   img.className = "gear-row-icon";
 
+  // GRID CENTER
   const grid = document.createElement("div");
   grid.className = "gear-grid";
 
@@ -1167,30 +1220,37 @@ function renderCategory(id, items) {
       b.classList.add("equipped");
     }
 
-const boostsHtml = Object.entries(it.boosts)
-  .map(([skill, val]) => `
-    <span class="gear-boost">
-      +${val}
-      <img
-        class="gear-boost-icon"
-        src="${GEAR_ICON_BY_SKILL[skill]}"
-        alt="${skill}"
-      />
-    </span>
-  `)
-  .join(" ");
+    const boostsHtml = Object.entries(it.boosts)
+      .map(([skill, val]) => `
+        <span class="gear-boost">
+          +${val}
+          <img
+            class="gear-boost-icon"
+            src="${GEAR_ICON_BY_SKILL[skill]}"
+            alt="${skill}"
+          />
+        </span>
+      `)
+      .join(" ");
 
-b.innerHTML = `
-  <div class="gear-name">${it.name}</div>
-  <div class="gear-boosts">
-    ${boostsHtml}
-  </div>
-`;
-
+    b.innerHTML = `
+      <div class="gear-name">${it.name}</div>
+      <div class="gear-boosts">
+        ${boostsHtml}
+      </div>
+    `;
 
     b.addEventListener("click", () => {
+
       equipped[cat] =
-        equipped[cat] && equipped[cat].name === it.name ? null : it;
+        equipped[cat] && equipped[cat].name === it.name
+          ? null
+          : it;
+
+      // remove bonus se desequipar
+      if (!equipped[cat]) {
+        bonusLimit[cat] = null;
+      }
 
       recomputeEquipmentBoosts();
       updateGearButtonState();
@@ -1202,16 +1262,118 @@ b.innerHTML = `
     grid.appendChild(b);
   });
 
-// highlight icon when any item is equipped
-if (equipped[cat]) {
-    img.classList.add("icon-equipped");
-} else {
-    img.classList.remove("icon-equipped");
-}
- 
+  // BONUS RIGHT
+  const bonusWrap = document.createElement("div");
+  bonusWrap.className = "gear-bonus-wrap";
 
-cont.appendChild(img);
-cont.appendChild(grid);
+
+
+  const bonusBtn = document.createElement("button");
+  bonusBtn.className = "gear-bonus-btn";
+
+  const selected = bonusLimit[cat];
+  const amount = bonusAmount[cat] || 0;
+
+  bonusBtn.innerHTML = selected && amount > 0
+  ? `
+    <div class="gear-bonus-inner">
+      <img class="gear-bonus-icon" src="${GEAR_ICON_BY_SKILL[selected]}">
+      <div class="gear-bonus-value">+${amount}</div>
+    </div>
+  `
+  : `<span>+</span>`;
+
+  bonusBtn.addEventListener("click", e => {
+    e.stopPropagation();
+
+    if (!equipped[cat]) return;
+
+    const bonusSkills = [
+      "Aim",
+      "Handling",
+      "Quickness",
+      "Determination",
+      "Awareness",
+      "Teamplay",
+      "Gamesense",
+      "Movement"
+    ];
+
+    const currentIndex =
+      selected
+        ? bonusSkills.indexOf(selected)
+        : -1;
+
+    bonusLimit[cat] =
+  bonusSkills[
+    (currentIndex + 1) % bonusSkills.length
+  ];
+
+if (!bonusAmount[cat]) {
+  bonusAmount[cat] = 1;
+}
+
+recomputeEquipmentBoosts();
+    renderAllEquipmentUI();
+    renderSkills();
+    renderMiniGear();
+  });
+
+bonusWrap.appendChild(bonusBtn);
+const arrows = document.createElement("div");
+arrows.className = "gear-bonus-arrows";
+
+const up = document.createElement("button");
+up.className = "gear-bonus-arrow up";
+up.textContent = "▲";
+
+const down = document.createElement("button");
+down.className = "gear-bonus-arrow down";
+down.textContent = "▼";
+
+up.addEventListener("click", e => {
+  e.stopPropagation();
+  if (!bonusLimit[cat]) return;
+
+  bonusAmount[cat] =
+  Math.min(3, (bonusAmount[cat] || 1) + 1);
+
+  recomputeEquipmentBoosts();
+  renderAllEquipmentUI();
+  renderSkills();
+  renderMiniGear();
+});
+
+down.addEventListener("click", e => {
+  e.stopPropagation();
+  if (!bonusLimit[cat]) return;
+
+  bonusAmount[cat] = Math.max(0, (bonusAmount[cat] || 1) - 1);
+
+  if (bonusAmount[cat] === 0) {
+    bonusLimit[cat] = null;
+  }
+
+  recomputeEquipmentBoosts();
+  renderAllEquipmentUI();
+  renderSkills();
+  renderMiniGear();
+});
+
+arrows.appendChild(up);
+arrows.appendChild(down);
+bonusWrap.appendChild(arrows);
+
+  // ICON HIGHLIGHT
+  if (equipped[cat]) {
+    img.classList.add("icon-equipped");
+  } else {
+    img.classList.remove("icon-equipped");
+  }
+
+  cont.appendChild(img);
+  cont.appendChild(grid);
+  cont.appendChild(bonusWrap);
 }
 
 
@@ -1225,11 +1387,21 @@ function renderAllEquipmentUI() {
 
 function recomputeEquipmentBoosts() {
   equipmentBoosts = {};
-  Object.values(equipped).forEach(it => {
+
+  Object.entries(equipped).forEach(([cat, it]) => {
     if (!it) return;
+
+    // boosts normais do gear
     Object.entries(it.boosts).forEach(([skill, val]) => {
       equipmentBoosts[skill] = (equipmentBoosts[skill] || 0) + val;
     });
+
+    // bonus extra escolhido na casa da frente
+    const bonusSkill = bonusLimit[cat];
+    if (bonusSkill) {
+      equipmentBoosts[bonusSkill] =
+  (equipmentBoosts[bonusSkill] || 0) + (bonusAmount[cat] || 0);
+    }
   });
 }
 
@@ -1538,10 +1710,12 @@ if (antiBtn) antiBtn.classList.remove("active");
 
     // RESET GEAR
     Object.keys(equipped).forEach(k => equipped[k] = null);
+    Object.keys(bonusLimit).forEach(k => bonusLimit[k] = null);
     updateBoostLabels();
     recomputeEquipmentBoosts();
     renderAllEquipmentUI();
     updateGearButtonState();
+    resetLeadership();
 
     // RESET POPUPS
     gearLocked = false;
@@ -1837,11 +2011,6 @@ antiBtn.addEventListener("click", () => {
 
 
 
-
-
-    
-
-
   if (gameOkBtn) {
     gameOkBtn.addEventListener("click", () => {
       const value = parseInt(gameInput.value, 10);
@@ -1977,10 +2146,21 @@ window.addEventListener("load", () => {
     return;
   }
 
+<<<<<<< HEAD
   v.textContent = "v1.12.1 - 3:51 - May.16.2026";
 
   u.innerHTML = `
     <li>Add FireHeart 4%</li>
+=======
+  v.textContent = "v2.00.2 - 3:20 - May.23.2026";
+
+  u.innerHTML = `
+    <li>Added the new Leadership Boost System</li>
+    <li>Expanded Gear Bonus upgrades</li>
+    <li> UI customization & progression balancing</li>
+    <li>Morale Removed </li> 
+    <li>Add FireHeart 4%</li> 
+>>>>>>> 3dacaf3 (morale remove, LS system, gear bonus)
     <li>Mobile Final Fix</li> 
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
     <li>Fixed export png - Text wrapping issue</li> 
@@ -2054,6 +2234,7 @@ clearBtn.addEventListener("click", () => {
   renderMiniGear();
   computeMaxCareerHeart();
   updateTotals();
+  resetLeadership();
 
   input.blur();
 });
@@ -2143,4 +2324,52 @@ document.addEventListener("DOMContentLoaded", () => {
   bindMiniTooltip(document.getElementById("career-plus-btn"), "Long Lived");
   bindMiniTooltip(document.getElementById("antisocial-btn"), "Anti Social");
   bindMiniTooltip(document.getElementById("shortlived-btn"), "Short Lived");
+});
+
+// ===== LEADERSHIP =====
+
+document.addEventListener("DOMContentLoaded", () => {
+  const leadershipSlider = document.querySelector(".leadership-slider");
+  const leadershipKnob = document.getElementById("leadershipKnob");
+  const leadershipValue = document.getElementById("leadershipValue");
+
+  if (!leadershipSlider || !leadershipKnob || !leadershipValue) return;
+
+  updateLeadershipUI = function() {
+    const pct = leadership / 30;
+
+    leadershipKnob.style.left = `${pct * 100}%`;
+    leadershipValue.textContent = leadership;
+
+    renderSkills();
+  }
+
+  function setLeadershipFromClientX(clientX) {
+    const rect = leadershipSlider.getBoundingClientRect();
+
+    let x = clientX - rect.left;
+    x = Math.max(0, Math.min(rect.width, x));
+
+    leadership = Math.round((x / rect.width) * 30);
+
+    updateLeadershipUI();
+  }
+
+  leadershipSlider.addEventListener("pointerdown", e => {
+    setLeadershipFromClientX(e.clientX);
+    leadershipKnob.setPointerCapture(e.pointerId);
+  });
+
+  leadershipKnob.addEventListener("pointermove", e => {
+    if (e.buttons !== 1) return;
+    setLeadershipFromClientX(e.clientX);
+  });
+
+  document.addEventListener("pointermove", e => {
+    if (e.buttons !== 1) return;
+    if (!leadershipKnob.matches(":active")) return;
+    setLeadershipFromClientX(e.clientX);
+  });
+
+  updateLeadershipUI();
 });

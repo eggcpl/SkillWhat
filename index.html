@@ -58,10 +58,7 @@
         <div id="heart-boost-label" class="boost-label">+0%</div>
     </div>
 
-    <div class="action-col">
-        <button class="action-btn morale-btn"></button>
-        <div id="morale-boost-label" class="boost-label">+0%</div>
-    </div>
+
         <button class="action-btn max-btn"></button>
         <button class="action-btn gear-btn"></button>
         <button class="action-btn games-btn"></button>
@@ -69,6 +66,7 @@
 <button id="antisocial-btn" class="antisocial-btn"></button>
 <button id="career-plus-btn" class="career-plus-btn"></button>
 <button id="shortlived-btn" class="shortlived-btn"></button>
+
 
 
         
@@ -138,8 +136,11 @@
 
         <div class="tooltip-right">
             <div>Heart: <span id="tooltip-heart"></span></div>
-            <div>Morale: <span id="tooltip-morale"></span></div>
             <div>Gear: <span id="tooltip-gear"></span></div>
+            <div>
+  Leader:
+  <span id="tooltip-leader"></span>
+</div>
         </div>
     </div>
 </div>
@@ -150,6 +151,7 @@
 
         <button id="gear-drag">MOVE</button>
         <button id="gear-lock-btn">🔓</button>
+        <div class="gear-bonus-global-title">BONUS</div>
 
         <div class="gear-row"><div id="gear-mousepad" class="gear-grid"></div></div>
         <div class="gear-row"><div id="gear-mouse" class="gear-grid"></div></div>
@@ -231,5 +233,20 @@
 <div id="boost-tooltip" class="boost-tooltip"></div>
 <div id="mini-tooltip" class="mini-tooltip hidden"></div>
 <script src="main.js"></script>
+<!-- LEADERSHIP -->
+<div class="leadership-title">LEADERSHIP</div>
+<div class="leadership-slider-wrap">
+
+  <span class="leadership-min">0</span>
+
+  <div class="leadership-slider">
+
+    <div class="leadership-value" id="leadershipValue">0</div>
+
+<div class="leadership-knob" id="leadershipKnob"></div>
+
+  </div>
+
+  <span class="leadership-max">30</span>
 </body>
 </html>
