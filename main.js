@@ -2146,12 +2146,7 @@ window.addEventListener("load", () => {
     return;
   }
 
-<<<<<<< HEAD
-  v.textContent = "v1.12.1 - 3:51 - May.16.2026";
 
-  u.innerHTML = `
-    <li>Add FireHeart 4%</li>
-=======
   v.textContent = "v2.00.2 - 3:20 - May.23.2026";
 
   u.innerHTML = `
@@ -2160,7 +2155,6 @@ window.addEventListener("load", () => {
     <li> UI customization & progression balancing</li>
     <li>Morale Removed </li> 
     <li>Add FireHeart 4%</li> 
->>>>>>> 3dacaf3 (morale remove, LS system, gear bonus)
     <li>Mobile Final Fix</li> 
     <li>Fix Mobile and PC Load Function (Implicit Action)</li> 
     <li>Fixed export png - Text wrapping issue</li> 
