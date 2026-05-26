@@ -666,7 +666,7 @@ const total = document.createElement("span");
 total.className = "skill-total";
 
 if (v.final >= 100) {
-  total.textContent = Math.floor(v.final);
+  total.textContent = Math.min(110, Math.floor(v.final));
 } else {
   total.textContent = "";
 }
