@@ -21,6 +21,8 @@ const GEAR_ICON_BY_SKILL = {
 
 let missingPopupOpen = false;
 
+
+
 const boostTooltip = document.getElementById("boost-tooltip");
 
 function showBoostTooltip(e, finalValue) {
@@ -215,6 +217,17 @@ function resetLeadership() {
     renderSkills();
   }
 }
+
+function resetExperience() {
+  experience = 0;
+
+  if (updateExperienceUI) {
+    updateExperienceUI();
+  } else {
+    renderSkills();
+  }
+}
+
 let equipmentBoosts = {};
 
 /* ---------------- DATE & CLOCK ---------------- */
@@ -1010,6 +1023,7 @@ if (antiBtn) antiBtn.classList.remove("active");
     renderAllEquipmentUI();
     updateGearButtonState();
     resetLeadership();
+    resetExperience();
 
     // RESET POPUPS
     gearLocked = false;
@@ -1726,6 +1740,7 @@ if (antiBtn) antiBtn.classList.remove("active");
     renderAllEquipmentUI();
     updateGearButtonState();
     resetLeadership();
+    resetExperience();
 
     // RESET POPUPS
     gearLocked = false;
@@ -2239,6 +2254,7 @@ clearBtn.addEventListener("click", () => {
   computeMaxCareerHeart();
   updateTotals();
   resetLeadership();
+  resetExperience();
 
   input.blur();
 });
@@ -2413,4 +2429,61 @@ if (totalSkillBox && totalTooltip) {
     totalTooltip.classList.add("hidden");
   });
 
+}
+
+// ===== EXPERIENCE =====
+
+let experience = 0;
+let updateExperienceUI = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const experienceSlider = document.querySelector(".experience-slider");
+  const experienceKnob = document.getElementById("experienceKnob");
+  const experienceValue = document.getElementById("experienceValue");
+
+  if (!experienceSlider || !experienceKnob || !experienceValue) return;
+
+updateExperienceUI = function() {
+  const pct = experience / 60;
+
+  experienceKnob.style.left = `${pct * 100}%`;
+  experienceValue.textContent = experience;
+};
+
+  function setExperienceFromClientX(clientX) {
+    const rect = experienceSlider.getBoundingClientRect();
+
+    let x = clientX - rect.left;
+    x = Math.max(0, Math.min(rect.width, x));
+
+    experience = Math.round((x / rect.width) * 60);
+
+    updateExperienceUI();
+  }
+
+  experienceSlider.addEventListener("pointerdown", e => {
+    setExperienceFromClientX(e.clientX);
+    experienceKnob.setPointerCapture(e.pointerId);
+  });
+
+  experienceKnob.addEventListener("pointermove", e => {
+    if (e.buttons !== 1) return;
+    setExperienceFromClientX(e.clientX);
+  });
+
+  document.addEventListener("pointermove", e => {
+    if (e.buttons !== 1) return;
+    if (!experienceKnob.matches(":active")) return;
+    setExperienceFromClientX(e.clientX);
+  });
+
+  updateExperienceUI();
+});
+
+function resetExperience() {
+  experience = 0;
+
+  if (updateExperienceUI) {
+    updateExperienceUI();
+  }
 }
