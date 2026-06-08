@@ -940,9 +940,14 @@ function showTotalSkillTooltip(e) {
   document.getElementById("tooltip-limit").textContent = limitTotal;
   document.getElementById("tooltip-total").textContent = totalFinal.toFixed(2);
 
-  document.getElementById("tooltip-heart").textContent  = `+${heartBoosts[heartState]}%`;
-  document.getElementById("tooltip-morale").textContent = `+${moraleBoosts[moraleState]}%`;
-  document.getElementById("tooltip-gear").textContent   = `+${gearBoostTotal}`;
+  document.getElementById("tooltip-leader").textContent =
+  `+${getLeadershipBoost().toFixed(1)}%`;
+
+  document.getElementById("tooltip-heart").textContent =
+  `+${heartBoosts[heartState]}%`;
+
+  document.getElementById("tooltip-gear").textContent =
+  `+${gearBoostTotal}`;
 
   tooltip.style.left = e.pageX + 15 + "px";
   tooltip.style.top  = e.pageY + 15 + "px";
@@ -1360,7 +1365,7 @@ up.addEventListener("click", e => {
   if (!bonusLimit[cat]) return;
 
   bonusAmount[cat] =
-  Math.min(3, (bonusAmount[cat] || 1) + 1);
+  Math.min(5, (bonusAmount[cat] || 1) + 1);
 
   recomputeEquipmentBoosts();
   renderAllEquipmentUI();
