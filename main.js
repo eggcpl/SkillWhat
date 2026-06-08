@@ -917,7 +917,7 @@ const tooltip = document.getElementById("skill-tooltip");
 function showTotalSkillTooltip(e) {
   if (!tooltip) return;
 
-  document.getElementById("tooltip-skill-name").textContent = "TOTAL SKILL";
+  document.getElementById("tooltip-skill-name").textContent = "Total";
 
   let baseTotal = 0;
   let limitTotal = 0;
