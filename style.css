@@ -397,12 +397,16 @@ color: #ffffff;
   position: fixed;
   background: #1f1f1f;
   color: white;
-  padding: 12px 14px;
+  padding: 8px 15px;
   border-radius: 5px;
   border: 2px solid #8e8e8e;
   z-index: 9999;
-  min-width: 140px;       /* largura mínima */
-  max-width: 220px;       /* opcional — evita crescer demais */
+
+  width: fit-content;
+  min-width: 0;
+
+  max-width: 280px;
+
   pointer-events: none;
   box-shadow: 0px 4px 12px rgba(0,0,0,0.35);
   font-size: 12px;
@@ -412,15 +416,18 @@ color: #ffffff;
   transition: opacity .12s ease-in-out;
 }
 
+.tooltip-columns.single-column {
+  display: block;
+}
+
 .skill-tooltip.visible { opacity: 1; }
 .skill-tooltip.hidden { opacity: 0; }
 
 /* Títulos das duas colunas */
 .tooltip-title-row {
   display: grid;
-  grid-template-columns: 1fr 80px;
+  grid-template-columns: 1fr 110px;
   column-gap: 6px;
-  margin-bottom: 4px;
 }
 
 .tooltip-title-row span {
@@ -431,8 +438,12 @@ color: #ffffff;
 /* Conteúdo em 2 colunas alinhadas */
 .tooltip-columns {
   display: grid;
-  grid-template-columns: 1fr 80px;
-  column-gap: 6px;
+  grid-template-columns: 1fr 110px;
+  column-gap: 10px;
+}
+
+.tooltip-columns.single-column {
+  grid-template-columns: 1fr;
 }
 
 /* Esquerda / Direita */
@@ -440,9 +451,9 @@ color: #ffffff;
 .tooltip-right {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   line-height: 14px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* Cada linha */
@@ -2040,3 +2051,6 @@ pointer-events: auto;
   font-family: 'Poppins', sans-serif;
 }
 
+#tooltip-gear-bonus-row {
+  color: #7dff6b;
+}

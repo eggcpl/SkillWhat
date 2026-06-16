@@ -922,17 +922,36 @@ function showTotalSkillTooltip(e) {
   let baseTotal = 0;
   let limitTotal = 0;
   let gearBoostTotal = 0;
+  let gearBonusTotal = 0;
   let percentBoostTotal = 0;
+
+gearBonusTotal = Object.keys(bonusLimit).reduce((sum, cat) => {
+  if (equipped[cat] && bonusLimit[cat]) {
+    return sum + (bonusAmount[cat] || 0);
+  }
+  return sum;
+}, 0);
 
   skills.forEach(s => {
     const v = computeSkillValues(s);
     baseTotal += maxMode ? s.max : s.value;
     limitTotal += s.max;
-    gearBoostTotal += v.equipBoost || 0;
+gearBoostTotal += Math.max(
+  0,
+  (v.equipBoost || 0) -
+  Object.keys(bonusLimit).reduce((sum, cat) => {
+    if (bonusLimit[cat] === s.name) {
+      return sum + (bonusAmount[cat] || 0);
+    }
+    return sum;
+  }, 0)
+);
+
+
     percentBoostTotal += v.pctBoost || 0;
   });
 
-  const boostTotal = percentBoostTotal + gearBoostTotal;
+  const boostTotal = percentBoostTotal + gearBoostTotal + gearBonusTotal;
   const totalFinal = baseTotal + boostTotal;
 
   document.getElementById("tooltip-base").textContent  = baseTotal.toFixed(0);
@@ -940,14 +959,80 @@ function showTotalSkillTooltip(e) {
   document.getElementById("tooltip-limit").textContent = limitTotal;
   document.getElementById("tooltip-total").textContent = totalFinal.toFixed(2);
 
+const leaderBoost = getLeadershipBoost();
+const leaderRow = document.getElementById("tooltip-leader-row");
+
+
+
+if (leaderBoost > 0) {
   document.getElementById("tooltip-leader").textContent =
-  `+${getLeadershipBoost().toFixed(1)}%`;
+    `+${leaderBoost.toFixed(1)}%`;
+  leaderRow.classList.remove("hidden");
+} else {
+  document.getElementById("tooltip-leader").textContent = "";
+  leaderRow.classList.add("hidden");
+}
 
-  document.getElementById("tooltip-heart").textContent =
-  `+${heartBoosts[heartState]}%`;
+const heartRow = document.getElementById("tooltip-heart-row");
+const heartBoost = heartBoosts[heartState] || 0;
 
-  document.getElementById("tooltip-gear").textContent =
-  `+${gearBoostTotal}`;
+if (heartBoost > 0) {
+  document.getElementById("tooltip-heart").textContent = `+${heartBoost}%`;
+  heartRow.classList.remove("hidden");
+} else {
+  document.getElementById("tooltip-heart").textContent = "";
+  heartRow.classList.add("hidden");
+}
+
+const gearRow = document.getElementById("tooltip-gear-row");
+
+if (gearBoostTotal > 0) {
+  document.getElementById("tooltip-gear").textContent = `+${gearBoostTotal}`;
+  gearRow.classList.remove("hidden");
+} else {
+  document.getElementById("tooltip-gear").textContent = "";
+  gearRow.classList.add("hidden");
+}
+
+  const gearBonusRow = document.getElementById("tooltip-gear-bonus-row");
+const gearBonusEl = document.getElementById("tooltip-gear-bonus");
+
+if (gearBonusTotal > 0) {
+  gearBonusEl.textContent = `+${gearBonusTotal}`;
+  gearBonusRow.classList.remove("hidden");
+} else {
+  gearBonusEl.textContent = "";
+  gearBonusRow.classList.add("hidden");
+}
+
+const columns = document.querySelector(".tooltip-columns");
+const modifiersColumn = document.querySelector(".tooltip-right");
+const modifiersTitle = document.querySelector(".tooltip-title-row span:last-child");
+
+const hasModifiers =
+  leaderBoost > 0 ||
+  heartBoost > 0 ||
+  gearBoostTotal > 0 ||
+  gearBonusTotal > 0;
+
+const titleRow = document.querySelector(".tooltip-title-row");
+
+if (hasModifiers) {
+  modifiersColumn.style.display = "";
+  modifiersTitle.style.display = "";
+
+  titleRow.style.gridTemplateColumns = "1fr 110px";
+  columns.style.gridTemplateColumns = "1fr 110px";
+  tooltip.style.width = "max-content";
+
+} else {
+  modifiersColumn.style.display = "none";
+  modifiersTitle.style.display = "none";
+
+  titleRow.style.gridTemplateColumns = "1fr";
+  columns.style.gridTemplateColumns = "1fr";
+  tooltip.style.width = "fit-content";
+}
 
   tooltip.style.left = e.pageX + 15 + "px";
   tooltip.style.top  = e.pageY + 15 + "px";
@@ -969,18 +1054,57 @@ function showTooltipForSkill(s, e) {
   set("tooltip-limit", s.max);
   set("tooltip-boost", v.pctBoost.toFixed(2));
   set("tooltip-total", v.final.toFixed(2));
-set("tooltip-heart", "+" + heartBoosts[heartState] + "%");
+const heartRow = document.getElementById("tooltip-heart-row");
+const heartBoost = heartBoosts[heartState] || 0;
+
+if (heartBoost > 0) {
+  set("tooltip-heart", "+" + heartBoost + "%");
+  heartRow.classList.remove("hidden");
+} else {
+  heartRow.classList.add("hidden");
+}
 set("tooltip-morale", "+" + moraleBoosts[moraleState] + "%");
 
 const leaderBoost = getLeadershipBoost();
+const leaderRow = document.getElementById("tooltip-leader-row");
 
 if (leaderBoost > 0) {
   set("tooltip-leader", "+" + leaderBoost.toFixed(1) + "%");
+  leaderRow.classList.remove("hidden");
 } else {
-  set("tooltip-leader", "");
+  leaderRow.classList.add("hidden");
 }
 
-set("tooltip-gear", "+" + (v.equipBoost || 0));
+const gearBonusRow = document.getElementById("tooltip-gear-bonus-row");
+const gearBonusEl = document.getElementById("tooltip-gear-bonus");
+
+let gearBonus = 0;
+
+Object.keys(bonusLimit).forEach(cat => {
+  if (bonusLimit[cat] === s.name) {
+    gearBonus += bonusAmount[cat] || 0;
+  }
+});
+
+const gearNormal = Math.max(0, (v.equipBoost || 0) - gearBonus);
+
+const gearRow = document.getElementById("tooltip-gear-row");
+
+if (gearNormal > 0) {
+  set("tooltip-gear", "+" + gearNormal);
+  gearRow.classList.remove("hidden");
+} else {
+  set("tooltip-gear", "");
+  gearRow.classList.add("hidden");
+}
+
+if (gearBonus > 0) {
+  gearBonusEl.textContent = "+" + gearBonus;
+  gearBonusRow.classList.remove("hidden");
+} else {
+  gearBonusEl.textContent = "";
+  gearBonusRow.classList.add("hidden");
+}
 
   if (!tooltip) return;
   tooltip.style.left = e.pageX + 15 + "px";
