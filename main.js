@@ -204,7 +204,8 @@ const bonusAmount = {
 let leadership = 0;
 
 function getLeadershipBoost() {
-  return leadership * 0.2;
+  const capped = Math.min(25, leadership);
+  return capped * 0.2;
 }
 let updateLeadershipUI = null;
 
@@ -2318,6 +2319,7 @@ window.addEventListener("load", () => {
   v.textContent = "v2.00.9 - 18:12 - July.27.2026";
 
   u.innerHTML = `
+    <li>Leader Boost limited to 5%</li>
     <li>New Bar System</li>
     <li>Added the new Leadership Boost System</li>
     <li>Expanded Gear Bonus upgrades</li>
