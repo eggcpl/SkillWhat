@@ -2315,9 +2315,10 @@ window.addEventListener("load", () => {
   }
 
 
-  v.textContent = "v2.00.2 - 3:20 - May.23.2026";
+  v.textContent = "v2.00.9 - 18:12 - July.27.2026";
 
   u.innerHTML = `
+    <li>New Bar System</li>
     <li>Added the new Leadership Boost System</li>
     <li>Expanded Gear Bonus upgrades</li>
     <li> UI customization & progression balancing</li>
