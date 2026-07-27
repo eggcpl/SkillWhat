@@ -534,7 +534,14 @@ function renderSkills() {
     // WIDTHS (apenas 2 segmentos)
     // ------------------------------
     const baseW = Math.min(baseVal, 100);
-    const boostW = Math.max(0, Math.min(finalVal, 100) - baseW);
+
+// tudo acima de 100 vai para a barra de bónus
+const bonusOver100 = Math.max(0, Math.min(finalVal - 100, 10));
+
+const boostW = Math.max(
+  0,
+  Math.min(finalVal, 100) - baseW
+);
 
     const row = document.createElement("div");
     row.className = "skill-row";
@@ -587,59 +594,66 @@ bar.appendChild(limit);
     bar.appendChild(baseF);
 
     // ----------------------------------
+// BONUS OVER 100 (barra amarela)
+// ----------------------------------
+if (bonusOver100 > 0) {
+
+  const bonusF = document.createElement("div");
+  bonusF.className = "skill-fill-bonus";
+
+  bonusF.style.position = "absolute";
+  bonusF.style.left = "0";
+  bonusF.style.top = "0";
+  bonusF.style.height = "100%";
+  bonusF.style.width = ((bonusOver100 / 10) * 100) + "%";
+  bonusF.style.zIndex = 3;
+
+  bonusF.style.backgroundColor = "#eff0bc";
+  bonusF.style.borderRadius = "999px";
+  bonusF.style.boxShadow =
+    "0 0 10px rgba(238,223,192,0.8)";
+
+  bar.appendChild(bonusF);
+}
+
+    // ----------------------------------
     // BOOST TOTAL (HM + morale + gear)
     // ----------------------------------
 let boostF = null;
 
-// BOOST (HM + morale + gear) como único segmento de boost
 if (boostW > 0) {
   boostF = document.createElement("div");
   boostF.className = "skill-fill-boost";
   boostF.style.left = baseW + "%";
   boostF.style.width = boostW + "%";
   boostF.style.zIndex = 2;
-  
-  
 
-  // Se final >= 100 → dourado + brilho + canto redondo
   if (finalVal >= 100) {
-    boostF.style.backgroundColor = "#f7e395";
+    // chegou a 100 -> funde com a base, ponta direita arredondada
+    boostF.style.backgroundColor = "#ff7a00";
     boostF.style.borderRadius = "0 999px 999px 0";
-    boostF.style.boxShadow = "0 0 10px rgba(238,223,192,0.75)";
   } else {
+    // não chegou a 100 -> ponta direita reta
     boostF.style.backgroundColor = "#f5be9e";
     boostF.style.borderRadius = "0";
   }
+  boostF.style.boxShadow = "none";
 
   bar.appendChild(boostF);
 }
 
-// SE NÃO EXISTIR BOOST → base atinge 100 sozinha
-if (finalVal >= 100 && boostW === 0) {
-  baseF.style.backgroundColor = "#edeec0";
-  baseF.style.borderRadius = "999px";
-  baseF.style.boxShadow = "0 0 10px rgba(238,223,192,0.80)";
-}
+// BASE — só quando NÃO há boost, a base é que decide a ponta direita
+baseF.style.backgroundColor = "#ff7a00";
+baseF.style.boxShadow = "none";
 
-if (finalVal >= 100) {
-  baseF.style.backgroundColor = "#edeec0";
-  baseF.style.boxShadow =
-    "0 0 12px rgba(238,223,192,0.25), 0 0 28px rgba(255, 255, 255, 0.15)";
-
-  if (boostF) {
-    boostF.style.backgroundColor = "#f5be9e";
-    boostF.style.boxShadow = "none";
-  }
-
-} else {
-  baseF.style.backgroundColor = "#f56e0e";
-  baseF.style.boxShadow = "none";
-
-  if (boostF) {
-    boostF.style.backgroundColor = "#f5be9e";
-    boostF.style.boxShadow = "none";
+if (boostW === 0) {
+  if (finalVal >= 100) {
+    baseF.style.borderRadius = "999px"; // arredondado dos dois lados
+  } else {
+    baseF.style.borderRadius = "999px 0 0 999px"; // só esquerda arredondada
   }
 }
+
 
 
 
