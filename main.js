@@ -6,7 +6,8 @@ const ICON_TINY_HTML = '<span class="heart-small3">❤️</span>';
 const ICON_SMALL_HTML = '<span class="heart-small2">❤️</span>';
 const ICON_BIG_HTML   = '❤️';
 const ICON_GOLD_HTML  = '💛';
-const ICON_PLAT_HTML  = '💙';
+const ICON_PLAT_HTML  = '🩶';
+const ICON_DIAM_HTML  = '💙';
 
 const GEAR_ICON_BY_SKILL = {
   Aim: "https://i.postimg.cc/349bq0ZG/aim.png",
@@ -165,8 +166,9 @@ const heartBoosts = {
   2: 1,     // Medium
   3: 3,     // Big
   4: 5,     // Gold
-  5: 8,      // Platinum
-  6: 4, // Fire Heart
+  5: 6,     // Platinum
+  6: 8,     // Diamond
+  7: 4,     // Fire Heart
 };
 const moraleBoosts = { 0: 0, 1: 1, 2: 2, 3: 3 };
 
@@ -1196,17 +1198,12 @@ updateGamesButtonState();
 
 
     // RESET HEART SEASONS
-const tiny  = document.querySelector(".season-tiny");
-const small = document.querySelector(".season-small");
-const big   = document.querySelector(".season-big");
-const gold  = document.querySelector(".season-gold");
-const plat  = document.querySelector(".season-plat");
-
-if (tiny)  { tiny.textContent  = ""; tiny.style.color  = ""; }
-if (small) { small.textContent = "S9";  small.style.color = ""; }
-if (big)   { big.textContent   = "S11"; big.style.color   = ""; }
-if (gold)  { gold.textContent  = "S15"; gold.style.color  = ""; }
-if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
+  [".season-tiny", ".season-small", ".season-big",
+     ".season-gold", ".season-plat", ".season-diamond"]
+      .forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el) { el.textContent = ""; el.style.color = ""; }
+      });
 
     // RESET LOYAL
     const gameImgBtn = document.getElementById("game-img-btn");
@@ -1286,7 +1283,7 @@ loadedAge = data.playerAge;
 /* ---------------- HEART / MORALE / MAX ---------------- */
 if (heartBtn) {
   heartBtn.addEventListener("click", () => {
-    heartState = (heartState + 1) % 7;
+    heartState = (heartState + 1) % 8;
     heartBtn.className = "action-btn heart-grey-btn";
     if (heartState > 0) heartBtn.classList.add(`heart-active-${heartState}`);
     renderSkills();
@@ -1909,17 +1906,12 @@ if (gameOkBtn) {
     updateGamesButtonState();
 
     // RESET HEART SEASONS
-    const tiny  = document.querySelector(".season-tiny");
-const small = document.querySelector(".season-small");
-const big   = document.querySelector(".season-big");
-const gold  = document.querySelector(".season-gold");
-const plat  = document.querySelector(".season-plat");
-
-if (tiny)  { tiny.textContent  = ""; tiny.style.color  = ""; }
-if (small) { small.textContent = "S9";  small.style.color = ""; }
-if (big)   { big.textContent   = "S11"; big.style.color   = ""; }
-if (gold)  { gold.textContent  = "S15"; gold.style.color  = ""; }
-if (plat)  { plat.textContent  = "S23"; plat.style.color  = ""; }
+[".season-tiny", ".season-small", ".season-big",
+ ".season-gold", ".season-plat", ".season-diamond"]
+  .forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el) { el.textContent = ""; el.style.color = ""; }
+  });
 
     // RESET LOYAL
     const gameImgBtn = document.getElementById("game-img-btn");
@@ -1948,7 +1940,7 @@ if (ageEl)  ageEl.textContent  = loadedAge;
 function updateHeartRequirementLabels() {
   const rows = document.querySelectorAll(".heart-row");
 
-  const base = [50, 100, 200, 400, 800];
+  const base = [50, 100, 200, 400, 600, 800];
 
   let mult = 1;
 
@@ -1969,8 +1961,9 @@ function updateHeartsBasedOnGames(games) {
   const bigEl   = document.querySelector(".season-big");
   const goldEl  = document.querySelector(".season-gold");
   const platEl  = document.querySelector(".season-plat");
+  const diamEl  = document.querySelector(".season-diamond");
 
-  if (!tinyEl || !smallEl || !bigEl || !goldEl || !platEl) return;
+  if (!tinyEl || !smallEl || !bigEl || !goldEl || !platEl || !diamEl) return;
 
   const loyal = document.getElementById("loyal-status").textContent === "YES";
 const antisocial = document.getElementById("antisocial-btn")?.classList.contains("active");
@@ -1989,7 +1982,8 @@ tinyReq  = Math.floor(50 * mult);
 smallReq = Math.floor(100 * mult);
 bigReq   = Math.floor(200 * mult);
 goldReq  = Math.floor(400 * mult);
-platReq  = Math.floor(800 * mult);
+platReq  = Math.floor(600 * mult);
+const diamReq = Math.floor(800 * mult);
 
 
   const ageText = document.querySelector(".player-age")?.textContent || "";
@@ -2035,17 +2029,22 @@ if (ageAtSeason >= maxAge) return "❌";
   bigEl.textContent   = label(bigReq);
   goldEl.textContent  = label(goldReq);
   platEl.textContent  = label(platReq);
+  diamEl.textContent  = label(diamReq);
 
   [
     [tinyEl, tinyReq],
     [smallEl, smallReq],
     [bigEl, bigReq],
     [goldEl, goldReq],
-    [platEl, platReq]
+    [platEl, platReq],
+    [diamEl, diamReq]
   ].forEach(([el, req]) => {
     el.style.color = games >= req ? "#76ff76" : "";
   });
 }
+
+
+/* --- DOM READY: setup loyal + games input listeners --- */
 
 
 /* --- DOM READY: setup loyal + games input listeners --- */
@@ -2223,7 +2222,8 @@ tinyReq  = Math.floor(50 * mult);
 smallReq = Math.floor(100 * mult);
 bigReq   = Math.floor(200 * mult);
 goldReq  = Math.floor(400 * mult);
-platReq  = Math.floor(800 * mult);
+platReq  = Math.floor(600 * mult);
+const diamReq = Math.floor(800 * mult);
 
 
 function seasonGainFor(req) {
@@ -2242,6 +2242,7 @@ const tinySeason = seasonGainFor(tinyReq);
   const bigSeason   = seasonGainFor(bigReq);
   const goldSeason  = seasonGainFor(goldReq);
   const platSeason  = seasonGainFor(platReq);
+  const diamSeason  = seasonGainFor(diamReq);
 
   const maxAge = getMaxCareerAge();
 let seasonsLeft = maxAge - age;
@@ -2251,7 +2252,11 @@ let seasonsLeft = maxAge - age;
   let icon = null;
   let finalSeason = null;
 
-  if (platSeason.season <= retireSeason) {
+  if (diamSeason.season <= retireSeason) {
+  icon = ICON_DIAM_HTML;
+  finalSeason = "S" + diamSeason.season;
+
+} else if (platSeason.season <= retireSeason) {
   icon = ICON_PLAT_HTML;
   finalSeason = "S" + platSeason.season;
 
@@ -2316,9 +2321,10 @@ window.addEventListener("load", () => {
   }
 
 
-  v.textContent = "v2.00.9 - 18:12 - July.27.2026";
+  v.textContent = "v2.10.6 - 01:15 - September.1.2026";
 
   u.innerHTML = `
+    <li>New heart Boost system</li>
     <li>Leader Boost limited to 5%</li>
     <li>New Bar System</li>
     <li>Added the new Leadership Boost System</li>
