@@ -2462,9 +2462,10 @@ window.addEventListener("load", () => {
   }
 
 
-  v.textContent = "v2.10.6 - 01:15 - September.1.2026";
+  v.textContent = "v4.1.1 - 01:15 - October.19.2026";
 
   u.innerHTML = `
+    <li>talents craft and generate best talents, best gear feature and lot of updates</li>
     <li>New heart Boost system</li>
     <li>Leader Boost limited to 5%</li>
     <li>New Bar System</li>
