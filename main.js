@@ -206,9 +206,10 @@ const bonusAmount = {
 let leadership = 0;
 
 function getLeadershipBoost() {
-  const capped = Math.min(25, leadership);
+  const capped = Math.min(30, leadership);
   return capped * 0.2;
 }
+
 let updateLeadershipUI = null;
 
 function resetLeadership() {
@@ -931,6 +932,35 @@ if (maxMode) {
 
 /* ---------------- TOOLTIP ---------------- */
 const tooltip = document.getElementById("skill-tooltip");
+function positionSkillTooltip(e) {
+  if (!tooltip) return;
+
+  const gap = 10;
+  const zoom =
+    parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+
+  const desiredLeft = e.clientX + gap;
+  const desiredTop = e.clientY + gap;
+
+  tooltip.style.position = "fixed";
+  tooltip.style.right = "auto";
+  tooltip.style.bottom = "auto";
+  tooltip.style.transform = "none";
+
+  // Posição inicial
+  tooltip.style.left = "0px";
+  tooltip.style.top = "0px";
+
+  const origin = tooltip.getBoundingClientRect();
+
+  // Converter a posição visual para coordenadas CSS
+  tooltip.style.left =
+    `${(desiredLeft - origin.left) / zoom}px`;
+
+  tooltip.style.top =
+    `${(desiredTop - origin.top) / zoom}px`;
+}
+
 function showTotalSkillTooltip(e) {
   if (!tooltip) return;
 
@@ -1051,10 +1081,9 @@ if (hasModifiers) {
   tooltip.style.width = "fit-content";
 }
 
-  tooltip.style.left = e.pageX + 15 + "px";
-  tooltip.style.top  = e.pageY + 15 + "px";
-  tooltip.classList.add("visible");
-  tooltip.classList.remove("hidden");
+tooltip.classList.add("visible");
+tooltip.classList.remove("hidden");
+positionSkillTooltip(e);
 }
 
 function showTooltipForSkill(s, e) {
@@ -1080,7 +1109,9 @@ if (heartBoost > 0) {
 } else {
   heartRow.classList.add("hidden");
 }
+
 set("tooltip-morale", "+" + moraleBoosts[moraleState] + "%");
+
 
 const leaderBoost = getLeadershipBoost();
 const leaderRow = document.getElementById("tooltip-leader-row");
@@ -1123,16 +1154,55 @@ if (gearBonus > 0) {
   gearBonusRow.classList.add("hidden");
 }
 
+// Verificar se existem modificadores ativos
+const hasModifiers =
+  heartBoost > 0 ||
+  leaderBoost > 0 ||
+  gearNormal > 0 ||
+  gearBonus > 0;
+
+// Elementos do tooltip
+const modifiersColumn = tooltip.querySelector(".tooltip-right");
+const modifiersTitle = tooltip.querySelector(".tooltip-title-row span:last-child");
+const columns = tooltip.querySelector(".tooltip-columns");
+const titleRow = tooltip.querySelector(".tooltip-title-row");
+
+// Mostrar ou esconder apenas os elementos existentes
+if (modifiersColumn) {
+  modifiersColumn.style.display = hasModifiers ? "" : "none";
+}
+
+if (modifiersTitle) {
+  modifiersTitle.style.display = hasModifiers ? "" : "none";
+}
+
+if (columns) {
+  columns.style.gridTemplateColumns = hasModifiers ? "1fr 110px" : "1fr";
+}
+
+if (titleRow) {
+  titleRow.style.gridTemplateColumns = hasModifiers ? "1fr 110px" : "1fr";
+}
+
+tooltip.style.width = hasModifiers ? "max-content" : "fit-content";
+
   if (!tooltip) return;
-  tooltip.style.left = e.pageX + 15 + "px";
-  tooltip.style.top = e.pageY + 15 + "px";
   tooltip.classList.add("visible");
-  tooltip.classList.remove("hidden");
+tooltip.classList.remove("hidden");
+positionSkillTooltip(e);
 }
 function hideTooltip() {
   if (!tooltip) return;
   tooltip.classList.remove("visible");
   tooltip.classList.add("hidden");
+}
+
+/* RESET SHARED: LOAD + RUBBER */
+function resetExtraSelections() {
+  window.dispatchEvent(new Event("skillwhat-reset-favorite-weapon"));
+  if (typeof window.SkillWhatResetTalents === "function") {
+    window.SkillWhatResetTalents();
+  }
 }
 
 /* ---------------- LOAD ---------------- */
@@ -1170,6 +1240,7 @@ if (antiBtn) antiBtn.classList.remove("active");
     updateGearButtonState();
     resetLeadership();
     resetExperience();
+    resetExtraSelections();
 
     // RESET POPUPS
     gearLocked = false;
@@ -1803,25 +1874,94 @@ document.addEventListener("mousedown", (e) => {
   document.addEventListener("touchend", onUp);
 })();
 
-/* DRAG for gear popup */
+
+/* DRAG for gear popup - corrigido para zoom 85% */
 (function () {
   const popup = document.getElementById("gear-popup");
   const dragArea = document.getElementById("gear-drag");
   if (!popup || !dragArea) return;
+
   let dragging = false;
   let offsetX = 0;
   let offsetY = 0;
-  function getClientEvent(e) { return e.touches ? e.touches[0] : e; }
-  function onDown(e) { const ev = getClientEvent(e); dragging = true; const rect = popup.getBoundingClientRect(); offsetX = ev.clientX - rect.left; offsetY = ev.clientY - rect.top; document.body.style.userSelect = "none"; dragArea.style.cursor = "grabbing"; if (e.cancelable) e.preventDefault(); }
-  function onUp() { dragging = false; document.body.style.userSelect = "auto"; dragArea.style.cursor = "grab"; }
-  function onMove(e) { if (!dragging) return; const ev = getClientEvent(e); let newLeft = ev.clientX - offsetX; let newTop = ev.clientY - offsetY; const pad = 8; const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0); const rect = popup.getBoundingClientRect(); const w = rect.width; if (newLeft < pad) newLeft = pad; if (newTop < pad) newTop = pad; if (newLeft + w > vw - pad) newLeft = vw - w - pad; popup.style.left = newLeft + "px"; popup.style.top = newTop + "px"; if (e.cancelable) e.preventDefault(); }
+
+  function getClientEvent(e) {
+    return e.touches ? e.touches[0] : e;
+  }
+
+  function getZoom() {
+    return parseFloat(
+      getComputedStyle(document.documentElement).zoom
+    ) || 1;
+  }
+
+  function onDown(e) {
+    const ev = getClientEvent(e);
+    const rect = popup.getBoundingClientRect();
+
+    dragging = true;
+
+    offsetX = ev.clientX - rect.left;
+    offsetY = ev.clientY - rect.top;
+
+    document.body.style.userSelect = "none";
+    dragArea.style.cursor = "grabbing";
+
+    if (e.cancelable) e.preventDefault();
+  }
+
+  function onUp() {
+    dragging = false;
+    document.body.style.userSelect = "auto";
+    dragArea.style.cursor = "grab";
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+
+    const ev = getClientEvent(e);
+    const zoom = getZoom();
+    const rect = popup.getBoundingClientRect();
+
+    const pad = 8;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let newLeft = ev.clientX - offsetX;
+    let newTop = ev.clientY - offsetY;
+
+    newLeft = Math.max(
+      pad,
+      Math.min(newLeft, vw - rect.width - pad)
+    );
+
+    newTop = Math.max(
+      pad,
+      Math.min(newTop, vh - rect.height - pad)
+    );
+
+    popup.style.left = (newLeft / zoom) + "px";
+    popup.style.top = (newTop / zoom) + "px";
+
+    if (e.cancelable) e.preventDefault();
+  }
+
   dragArea.addEventListener("mousedown", onDown);
-  document.addEventListener("mouseup", onUp);
   document.addEventListener("mousemove", onMove);
-  dragArea.addEventListener("touchstart", onDown, { passive: false });
+  document.addEventListener("mouseup", onUp);
+
+  dragArea.addEventListener("touchstart", onDown, {
+    passive: false
+  });
+
+  document.addEventListener("touchmove", onMove, {
+    passive: false
+  });
+
   document.addEventListener("touchend", onUp);
-  document.addEventListener("touchmove", onMove, { passive: false });
 })();
+
 
 /* LOCK button toggles whether outside clicks close the popup */
 let gearLocked = false;
@@ -1882,6 +2022,7 @@ if (antiBtn) antiBtn.classList.remove("active");
     updateGearButtonState();
     resetLeadership();
     resetExperience();
+    resetExtraSelections();
 
     // RESET POPUPS
     gearLocked = false;
@@ -2527,22 +2668,28 @@ document.addEventListener("DOMContentLoaded", () => {
     updateLeadershipUI();
   }
 
-  leadershipSlider.addEventListener("pointerdown", e => {
-    setLeadershipFromClientX(e.clientX);
+    let leadershipDragging = false;
+
+  leadershipKnob.addEventListener("pointerdown", e => {
+    if (e.button !== 0) return;
+    leadershipDragging = true;
     leadershipKnob.setPointerCapture(e.pointerId);
+    e.stopPropagation();
+    e.preventDefault();
   });
 
   leadershipKnob.addEventListener("pointermove", e => {
-    if (e.buttons !== 1) return;
+    if (!leadershipDragging) return;
     setLeadershipFromClientX(e.clientX);
   });
 
-  document.addEventListener("pointermove", e => {
-    if (e.buttons !== 1) return;
-    if (!leadershipKnob.matches(":active")) return;
-    setLeadershipFromClientX(e.clientX);
-  });
+  const stopLeadershipDrag = () => {
+    leadershipDragging = false;
+  };
 
+  leadershipKnob.addEventListener("pointerup", stopLeadershipDrag);
+  leadershipKnob.addEventListener("pointercancel", stopLeadershipDrag);
+  leadershipKnob.addEventListener("lostpointercapture", stopLeadershipDrag);
   updateLeadershipUI();
 });
 const totalSkillBox = document.querySelector(".total-skill-box");
@@ -2595,12 +2742,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!experienceSlider || !experienceKnob || !experienceValue) return;
 
+
 updateExperienceUI = function() {
   const pct = experience / 60;
 
   experienceKnob.style.left = `${pct * 100}%`;
   experienceValue.textContent = experience;
+
+  const frame = document.getElementById("talents-frame");
+
+  if (frame && frame.contentWindow) {
+    frame.contentWindow.postMessage({
+      type: "SKILLWHAT_EXPERIENCE",
+      value: experience
+    }, window.location.origin);
+  }
 };
+
 
   function setExperienceFromClientX(clientX) {
     const rect = experienceSlider.getBoundingClientRect();
@@ -2613,22 +2771,28 @@ updateExperienceUI = function() {
     updateExperienceUI();
   }
 
-  experienceSlider.addEventListener("pointerdown", e => {
-    setExperienceFromClientX(e.clientX);
+  let experienceDragging = false;
+
+  experienceKnob.addEventListener("pointerdown", e => {
+    if (e.button !== 0) return;
+    experienceDragging = true;
     experienceKnob.setPointerCapture(e.pointerId);
+    e.stopPropagation();
+    e.preventDefault();
   });
 
   experienceKnob.addEventListener("pointermove", e => {
-    if (e.buttons !== 1) return;
+    if (!experienceDragging) return;
     setExperienceFromClientX(e.clientX);
   });
 
-  document.addEventListener("pointermove", e => {
-    if (e.buttons !== 1) return;
-    if (!experienceKnob.matches(":active")) return;
-    setExperienceFromClientX(e.clientX);
-  });
+  const stopExperienceDrag = () => {
+    experienceDragging = false;
+  };
 
+  experienceKnob.addEventListener("pointerup", stopExperienceDrag);
+  experienceKnob.addEventListener("pointercancel", stopExperienceDrag);
+  experienceKnob.addEventListener("lostpointercapture", stopExperienceDrag);
   updateExperienceUI();
 });
 
@@ -2639,3 +2803,353 @@ function resetExperience() {
     updateExperienceUI();
   }
 }
+
+
+/* =========================================
+   BEST GEAR - CPL MANAGER PLUS
+========================================= */
+
+const BG_SKILLS = [
+  "Aim", "Handling", "Quickness", "Determination",
+  "Awareness", "Teamplay", "Gamesense", "Movement"
+];
+
+const BG_CATEGORIES = [
+  "mousepad", "mouse", "keyboard", "headset"
+];
+
+// Weightings fornecidos por ti
+const BG_WEIGHTS = [
+  1.2, 0.9, 1.3, 1.4,
+  0.8, 0.7, 0.6, 0.7
+];
+
+// Versões Plus do CPL Manager
+const BG_PLUS = [
+  { name: "Normal", skill: null, amount: 0 },
+  { name: "Precision", skill: "Aim", amount: 1 },
+  { name: "Grip", skill: "Handling", amount: 2 },
+  { name: "Edge", skill: "Quickness", amount: 1 },
+  { name: "Resolve", skill: "Determination", amount: 1 },
+  { name: "Hawk", skill: "Awareness", amount: 1 },
+  { name: "Synergy", skill: "Teamplay", amount: 4 },
+  { name: "Oracle", skill: "Gamesense", amount: 4 },
+  { name: "Swift", skill: "Movement", amount: 4 }
+];
+
+function calculateBestGear() {
+
+  // Skills atuais, incluindo Heart e Leadership,
+  // mas sem o equipamento atualmente selecionado.
+  const base = BG_SKILLS.map(name => {
+    const skill = skills.find(s => s.name === name);
+    return computeSkillValues(skill).afterPercent;
+  });
+
+  const available = base.map(value =>
+    Math.max(0, 110 - value)
+  );
+
+  // Cria as 36 possibilidades por categoria
+  const options = BG_CATEGORIES.map(category => {
+    const result = [];
+
+    for (const item of EQUIPMENT[category]) {
+      for (const plus of BG_PLUS) {
+
+        const boosts = BG_SKILLS.map(name =>
+          (item.boosts[name] || 0) +
+          (plus.skill === name ? plus.amount : 0)
+        );
+
+        result.push({ item, plus, boosts });
+      }
+    }
+
+    return result;
+  });
+
+  let bestScore = -Infinity;
+  let bestWaste = Infinity;
+  let bestCombination = null;
+
+  // Testa todas as combinações
+  for (const a of options[0]) {
+    for (const b of options[1]) {
+      for (const c of options[2]) {
+        for (const d of options[3]) {
+
+          let score = 0;
+          let waste = 0;
+
+          for (let i = 0; i < 8; i++) {
+
+            const total =
+              a.boosts[i] +
+              b.boosts[i] +
+              c.boosts[i] +
+              d.boosts[i];
+
+            const useful = Math.min(
+              total,
+              available[i]
+            );
+
+            waste += total - useful;
+
+            // Player-aware value: boosts remain useful up to 110, but
+            // points that reach the 100 threshold are more valuable.
+            // Existing weights remain the general skill priorities.
+            const before = base[i];
+            const after = before + useful;
+            const below100 = Math.max(0, Math.min(after, 100) - Math.min(before, 100));
+            const above100 = useful - below100;
+
+            // A stronger natural skill has slightly higher leverage,
+            // while weaker skills still receive meaningful consideration.
+            const playerFactor = 0.8 + 0.4 * Math.min(110, Math.max(0, before)) / 110;
+            const thresholdBonus = before < 100 && after >= 100 ? 0.75 : 0;
+
+            score += BG_WEIGHTS[i] * playerFactor *
+              (below100 + above100 * 0.65 + thresholdBonus);
+          }
+
+          // Desempate: menos pontos desperdiçados
+          if (
+            score > bestScore + 1e-9 ||
+            (
+              Math.abs(score - bestScore) <= 1e-9 &&
+              waste < bestWaste
+            )
+          ) {
+            bestScore = score;
+            bestWaste = waste;
+            bestCombination = [a, b, c, d];
+          }
+        }
+      }
+    }
+  }
+
+  if (!bestCombination) return;
+
+  // Aplica o equipamento vencedor
+  BG_CATEGORIES.forEach((category, i) => {
+    const choice = bestCombination[i];
+
+    equipped[category] = choice.item;
+    bonusLimit[category] = choice.plus.skill;
+    bonusAmount[category] = choice.plus.amount;
+  });
+
+  // Atualiza o SkillWhat
+  recomputeEquipmentBoosts();
+  updateGearButtonState();
+  renderAllEquipmentUI();
+  renderSkills();
+  renderMiniGear();
+
+  // Apresenta o resultado
+  const output = document.getElementById("best-gear-result");
+
+  if (output) {
+    output.replaceChildren();
+
+    bestCombination.forEach((choice, i) => {
+      const line = document.createElement("div");
+      const plus = choice.plus;
+
+      line.textContent =
+        BG_CATEGORIES[i].toUpperCase() + ": " +
+        choice.item.name +
+        (plus.skill
+          ? " | " + plus.name +
+            " (+" + plus.amount + " " + plus.skill + ")"
+          : " | Normal");
+
+      output.appendChild(line);
+    });
+
+    const summary = document.createElement("div");
+    summary.style.marginTop = "8px";
+    summary.style.fontWeight = "bold";
+    summary.textContent =
+      "Score: " + bestScore.toFixed(2) +
+      " | Wasted: " + bestWaste.toFixed(2);
+
+    output.appendChild(summary);
+  }
+}
+
+// Instala o botão no popup GEAR
+function installBestGear() {
+
+  const popup = document.getElementById("gear-popup");
+  if (!popup) return;
+
+  if (document.getElementById("best-gear-btn")) {
+    return;
+  }
+
+  const container =
+    popup.querySelector(".gear-popup-inner");
+
+  if (!container) {
+    console.error("BEST GEAR: popup interno não encontrado.");
+    return;
+  }
+
+  const button = document.createElement("button");
+  button.id = "best-gear-btn";
+  button.type = "button";
+  button.textContent = "ϟ BEST GEAR ϟ";
+
+  button.style.cssText = `
+    display:block;
+    margin:14px auto 8px;
+    padding:10px 24px;
+    background:#ff8200;
+    color:#171717;
+    border:0;
+    border-radius:8px;
+    font-weight:800;
+    cursor:pointer;
+  `;
+
+  const output = document.createElement("div");
+  output.id = "best-gear-result";
+  output.style.cssText = `
+    text-align:center;
+    font-size:12px;
+    line-height:1.7;
+    padding:8px;
+    color:#ddd;
+  `;
+
+  button.addEventListener("click", () => {
+    button.disabled = true;
+    button.textContent = "CALCULATING...";
+
+    setTimeout(() => {
+      try {
+        calculateBestGear();
+      } catch (error) {
+        console.error("BEST GEAR ERROR:", error);
+        alert("Erro no BEST GEAR. Consulta a consola.");
+      } finally {
+        button.disabled = false;
+        button.textContent = "ϟ BEST GEAR ϟ";
+      }
+    }, 30);
+  });
+
+  container.appendChild(button);
+  container.appendChild(output);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    installBestGear
+  );
+} else {
+  installBestGear();
+}
+
+
+/* ==========================
+   FAVORITE WEAPON SELECTOR
+========================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+    const changeBtn = document.getElementById("favorite-weapon-change");
+    const popup = document.getElementById("weapon-popup");
+    const closeBtn = document.getElementById("weapon-popup-close");
+    const weaponList = document.getElementById("weapon-popup-list");
+    const weaponDisplay = document.getElementById("favorite-weapon-select");
+
+    if (!changeBtn || !popup || !closeBtn || !weaponList || !weaponDisplay) return;
+
+    // Aproveitar o SVG original da AK-47
+    const akSvg = weaponDisplay.querySelector("svg")?.outerHTML || "";
+
+
+const weapons = Object.entries(weaponSVGs).map(([name, svg]) => ({
+    name,
+    svg
+}));
+
+
+    let selectedWeapon = null;
+    const initialWeaponMarkup = weaponDisplay.innerHTML;
+    window.addEventListener("skillwhat-reset-favorite-weapon", () => {
+        selectedWeapon = null;
+        weaponDisplay.innerHTML = initialWeaponMarkup;
+        popup.classList.add("hidden");
+    });
+
+    function renderWeaponList() {
+        weaponList.innerHTML = "";
+
+        weapons.forEach(weapon => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "weapon-option";
+
+            if (weapon.name === selectedWeapon) {
+                button.classList.add("selected");
+            }
+
+            const svg = weapon.svg || "";
+            button.innerHTML = `${svg}<span>${weapon.name}</span>`;
+
+            button.addEventListener("click", () => {
+                selectedWeapon = weapon.name;
+
+                const displaySvg = weaponDisplay.querySelector("svg");
+                if (displaySvg) {
+                    displaySvg.style.display = weapon.svg ? "" : "none";
+                }
+
+                if (weapon.svg && displaySvg) {
+                    displaySvg.outerHTML = weapon.svg;
+                }
+
+
+
+                popup.classList.add("hidden");
+            });
+
+            weaponList.appendChild(button);
+        });
+    }
+
+    changeBtn.addEventListener("click", () => {
+        renderWeaponList();
+        popup.classList.remove("hidden");
+    });
+
+    closeBtn.addEventListener("click", () => {
+        popup.classList.add("hidden");
+    });
+
+    popup.addEventListener("click", e => {
+        if (e.target === popup) {
+            popup.classList.add("hidden");
+        }
+    });
+});
+
+
+
+
+
+
+
+// Read-only snapshot for the Talent optimizer.
+window.SkillWhatTalentSnapshot = function () {
+  return Object.fromEntries(skills.map(s => {
+    const v = computeSkillValues(s);
+    return [s.name, { base: v.base, max: s.max, final: Math.min(110, v.final) }];
+  }));
+};

@@ -11,6 +11,7 @@
     <title>SkillWhat - CPL</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="talent-popup.css">
 </head>
 
 <body>
@@ -29,6 +30,21 @@
 
 <!-- ================= CARD ================= -->
 <div class="card">
+    <div class="favorite-weapon">
+  <div class="favorite-weapon-header">
+    <span>FAVORITE WEAPON</span>
+    <button id="favorite-weapon-change" type="button" title="Change weapon">⟳</button>
+  </div>
+
+  <button id="favorite-weapon-select" type="button">
+<svg viewBox="0 0 537 152" fill="none"
+     xmlns="http://www.w3.org/2000/svg"
+     aria-label="Knife">
+  <path fill="currentColor" d="M508 67 L505 59 L501 55 L467 55 L466 54 L424 53 L423 52 L386 52 L385 53 L361 53 L360 54 L349 54 L348 55 L337 55 L336 56 L318 56 L308 52 L300 44 L297 38 L295 28 L287 27 L285 30 L285 38 L290 51 L289 52 L269 52 L266 54 L263 61 L261 63 L257 63 L255 61 L255 58 L257 53 L250 53 L248 55 L246 60 L243 63 L239 63 L237 61 L239 53 L232 53 L228 61 L226 63 L221 63 L220 62 L221 54 L214 54 L208 63 L204 63 L202 61 L204 54 L196 54 L191 63 L186 63 L184 60 L186 54 L180 54 L178 55 L173 63 L169 63 L168 62 L169 54 L162 54 L160 56 L158 61 L155 63 L153 63 L150 61 L151 55 L143 55 L137 63 L134 63 L132 61 L134 55 L126 55 L120 63 L116 63 L114 61 L116 56 L91 56 L82 59 L79 61 L58 68 L55 68 L51 70 L41 72 L37 74 L33 74 L32 75 L29 75 L20 78 L16 78 L11 80 L2 81 L12 92 L22 100 L30 104 L32 106 L34 106 L39 109 L48 112 L56 113 L57 114 L65 114 L66 115 L234 115 L235 114 L273 114 L278 108 L286 104 L294 104 L302 113 L305 119 L307 125 L307 130 L308 131 L308 138 L309 139 L317 139 L319 137 L319 131 L318 130 L318 116 L322 107 L327 102 L334 99 L342 99 L343 100 L347 100 L351 102 L355 102 L360 104 L370 105 L371 106 L378 106 L379 107 L415 107 L416 106 L424 106 L425 105 L431 105 L432 104 L446 102 L458 98 L467 98 L476 101 L479 103 L484 108 L488 116 L491 119 L502 118 L504 116 L504 112 L506 106 L506 99 L507 98 Z"/>
+</svg>
+    <span>Knife</span>
+</button>
+</div>
 <svg id="gear-minimap"
      class="gear-minimap"
      width="50"
@@ -267,6 +283,8 @@
 <div id="boost-tooltip" class="boost-tooltip"></div>
 <div id="mini-tooltip" class="mini-tooltip hidden"></div>
 <script src="main.js"></script>
+<script src="weapons.js"></script>
+<script src="talent-popup.js"></script>
 <!-- LEADERSHIP -->
 <div class="top-stats">
 
@@ -309,13 +327,30 @@
       </div>
 
       <span class="experience-max"></span>
-
+    </div>
     </div>
 
+
+
+
+<!-- FAVORITE WEAPON POPUP -->
+<div id="weapon-popup" class="weapon-popup hidden">
+  <div class="weapon-popup-content">
+    <div class="weapon-popup-header">
+      <span>SELECT FAVORITE WEAPON</span>
+      <button id="weapon-popup-close" type="button">✕</button>
+    </div>
+
+    <div id="weapon-popup-list" class="weapon-popup-list">
+      <!-- As armas serão adicionadas pelo JavaScript -->
+    </div>
   </div>
+</div>
+
+
 
 </div>
 
-  
+
 </body>
 </html>

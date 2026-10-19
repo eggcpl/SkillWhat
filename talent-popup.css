@@ -1,0 +1,1290 @@
+#sw-talent-overlay{
+    position:fixed;
+    inset:0;
+    z-index:30000;
+    background:rgba(0,0,0,.82);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    box-sizing:border-box;
+    color:#eee;
+    font-family:Poppins,Arial,sans-serif
+    
+}
+#sw-talent-overlay.sw-talent-hidden{
+    display:none
+}
+.sw-talent-modal {
+    width: min(980px, 130vw);
+    max-height: none;
+    background: #171719;
+    border: 1px solid #45434a;
+    border-radius: 14px;
+    padding: 16px;
+    box-sizing: border-box;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+}
+.sw-talent-modal {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+
+.sw-talent-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:14px;
+    font-size:14px
+}
+.sw-talent-head strong{
+    color:#b8b29c
+}
+.sw-talent-head button{
+    background:#303035;
+    border:1px solid #555;
+    color:#eee;
+    border-radius:6px;
+    padding:7px 10px;
+    cursor:pointer
+}
+.sw-talent-head #sw-talent-points{
+    margin-left:auto;
+    color:#e8dfba;
+    font-size:12px
+}
+.sw-talent-columns{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px
+}
+.sw-talent-column{
+    min-height:370px;
+    border:1px solid var(--sw-border);
+    border-radius:15px;
+    padding:14px 10px;
+    background:var(--sw-bg);
+    box-sizing:border-box
+}
+.sw-talent-column[data-group=Weaponscraft]{
+    --sw-border:#60451a;
+    --sw-bg:#28231b;
+    --sw-accent:#ffd14b
+}
+.sw-talent-column[data-group=Aggression]{
+    --sw-border:#5a272e;
+    --sw-bg:#281d20;
+    --sw-accent:#ff999e
+}
+.sw-talent-column[data-group=Composure]{
+    --sw-border:#1b5360;
+    --sw-bg:#19292d;
+    --sw-accent:#50e1ef
+}
+.sw-talent-column[data-group=Synergy]{
+    --sw-border:#463364;
+    --sw-bg:#231e2d;
+    --sw-accent:#c6adff
+}
+.sw-talent-column h3{
+    text-align:center;
+    color:var(--sw-accent);
+    font-size:15px;
+    margin:0 0 22px
+}
+.sw-talent-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:26px 14px;
+    justify-items:center
+}
+.sw-talent-node{
+    width:55px;
+    height:55px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--sw-border);
+    border-radius:12px;
+    background:color-mix(in srgb,var(--sw-accent) 25%,#151515);
+    color:var(--sw-accent);
+    cursor:pointer;
+    transition:filter .15s
+}
+.sw-talent-node:hover{
+    filter:brightness(1.35)
+}
+.sw-talent-node.sw-active{
+    background:var(--sw-accent);
+    color:#161616;
+    box-shadow:0 0 13px color-mix(in srgb,var(--sw-accent) 45%,transparent)
+}
+.sw-talent-node.sw-locked{
+    opacity:.38
+}
+.sw-talent-icon{
+    font-size:25px;
+    line-height:1
+}
+.sw-talent-rank{
+    position:absolute;
+    bottom:-5px;
+    right:-9px;
+    background:#182538;
+    color:#fff;
+    border-radius:3px;
+    padding:2px 4px;
+    font-size:10px;
+    font-weight:bold
+}
+.sw-talent-help{
+    text-align:center;
+    color:#a7a7a7;
+    font-size:11px;
+    margin-top:14px
+}
+@media(max-width:680px){
+    .sw-talent-columns{
+        grid-template-columns:repeat(2,minmax(0,1fr))
+    }
+    .sw-talent-column{
+        min-height:320px
+    }
+    
+}
+/* Caixa das quatro Weapon Masteries e ligações automáticas */
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-grid{
+    position:relative;
+    isolation:isolate
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node{
+    z-index:1
+}
+.sw-weapons-links{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow:visible;
+    pointer-events:none;
+    z-index:0
+}
+.sw-weapons-links .sw-weapon-box{
+    fill:rgba(130,91,27,.10);
+    stroke:#a77a24;
+    stroke-width:1.5;
+    stroke-dasharray:5 4
+}
+.sw-weapons-links .sw-weapon-line{
+    fill:none;
+    stroke:#c18a25;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round
+}
+
+
+/* AJUSTES ATUAIS DOS ICONES E DA CAIXA WEAPONSCRAFT */
+.sw-talent-icon {
+     font-size:30px;
+     line-height:1;
+     
+}
+.sw-talent-icon svg {
+     width:10px;
+     height:10px;
+     
+}
+
+.sw-talent-node .sw-talent-icon {
+     font-size:35px !important;
+     
+}
+.sw-talent-node .sw-talent-icon svg {
+     width:35px !important;
+     height:35px !important;
+     max-width:none !important;
+     max-height:none !important;
+     
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-child(3) .sw-talent-icon svg {
+     transform:scale(1);
+     
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-child(4) .sw-talent-icon svg {
+     transform:scale(1.6) translate(4px,0px);
+     
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-child(5) .sw-talent-icon svg {
+     transform:scale(1.4);
+     
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-child(2) .sw-talent-icon svg {
+     transform:scale(1.2) scaleX(-1) !important;
+     
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-child(n+6) .sw-talent-icon svg {
+     width:25px !important;
+     height:25px !important;
+     
+}
+
+/* ========================================
+   AGGRESSION - POSICOES E LIGACOES
+   Nao interfere com as outras categorias
+======================================== */
+.sw-talent-column[data-group="Aggression"] .sw-talent-grid {
+    position:relative;
+     isolation:isolate;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-rows:repeat(5,55px);
+    column-gap:0;
+     row-gap:28px;
+    justify-items:center;
+     align-items:center;
+}
+.sw-talent-column[data-group="Aggression"] .sw-talent-node {
+     z-index:1;
+     
+}
+/* point blank e runner */
+.sw-talent-column[data-group="Aggression"] .sw-talent-node:nth-of-type(1) {
+     grid-column:1;
+     grid-row:1;
+     
+}
+.sw-talent-column[data-group="Aggression"] .sw-talent-node:nth-of-type(2) {
+     grid-column:3;
+     grid-row:1;
+     
+}
+/* fast fingers */
+.sw-talent-column[data-group="Aggression"] .sw-talent-node:nth-of-type(3) {
+     grid-column:2;
+     grid-row:2;
+     
+}
+/* evasion, fast flick e hot start */
+.sw-talent-column[data-group="Aggression"] .sw-talent-node:nth-of-type(4) {
+     grid-column:3;
+     grid-row:3;
+     
+}
+.sw-talent-column[data-group="Aggression"] .sw-talent-node:nth-of-type(5) {
+     grid-column:2;
+     grid-row:3;
+     
+}
+.sw-talent-column[data-group="Aggression"] .sw-talent-node:nth-of-type(6) {
+     grid-column:1;
+     grid-row:3;
+     
+}
+/* backstabber e opening duel */
+.sw-talent-column[data-group="Aggression"] .sw-talent-node:nth-of-type(7) {
+     grid-column:3;
+     grid-row:4;
+     
+}
+.sw-talent-column[data-group="Aggression"] .sw-talent-node:nth-of-type(8) {
+     grid-column:2;
+     grid-row:5;
+     
+}
+.sw-aggression-links {
+     position:absolute;
+     inset:0;
+     width:100%;
+     height:100%;
+     overflow:visible;
+     pointer-events:none;
+     z-index:0;
+     
+}
+.sw-aggression-links path {
+     fill:none;
+     stroke:#9f424b;
+     stroke-width:2;
+     stroke-linecap:round;
+     
+}
+
+/* AGGRESSION: dimensoes dos SVG, sem afetar Weaponscraft */
+.sw-talent-column[data-group="Aggression"] .sw-talent-node .sw-talent-icon svg {
+    width: 31px !important;
+    height: 31px !important;
+    max-width: none !important;
+    max-height: none !important;
+}
+
+/* ========================================
+   COMPOSURE - DISPOSICAO E LIGACOES
+   Apenas esta categoria e alterada.
+======================================== */
+
+/* Grelha de 3 colunas e 5 linhas */
+.sw-talent-column[data-group="Composure"] .sw-talent-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(5, 55px);
+    column-gap: 0;
+    row-gap: 26px;
+    justify-items: center;
+    align-items: center;
+    position: relative;
+}
+
+/* Os sete talentos nas posicoes da referencia */
+/* Calmness       Resilient */
+.sw-talent-column[data-group="Composure"] .sw-talent-node:nth-of-type(1) {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.sw-talent-column[data-group="Composure"] .sw-talent-node:nth-of-type(2) {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+/* Patience, debaixo de Calmness */
+.sw-talent-column[data-group="Composure"] .sw-talent-node:nth-of-type(3) {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+/* Bounce Back, terceira linha, direita */
+.sw-talent-column[data-group="Composure"] .sw-talent-node:nth-of-type(4) {
+    grid-column: 3;
+    grid-row: 3;
+}
+
+/* Lone Ranger, terceira linha, centro */
+.sw-talent-column[data-group="Composure"] .sw-talent-node:nth-of-type(5) {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+/* Slow Burn, quarta linha, esquerda */
+.sw-talent-column[data-group="Composure"] .sw-talent-node:nth-of-type(6) {
+    grid-column: 1;
+    grid-row: 4;
+}
+
+/* Clutch, quinta linha, centro */
+.sw-talent-column[data-group="Composure"] .sw-talent-node:nth-of-type(7) {
+    grid-column: 2;
+    grid-row: 5;
+}
+
+/* Linhas turquesa; sao apenas decorativas */
+.sw-talent-column[data-group="Composure"]
+.sw-talent-node:nth-of-type(1)::after,
+.sw-talent-column[data-group="Composure"]
+.sw-talent-node:nth-of-type(3)::after,
+.sw-talent-column[data-group="Composure"]
+.sw-talent-node:nth-of-type(5)::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background: #268f9f;
+    pointer-events: none;
+}
+
+/* Calmness -> Patience (uma linha de distancia) */
+.sw-talent-column[data-group="Composure"]
+.sw-talent-node:nth-of-type(1)::after {
+    height: 27px;
+}
+
+/* Patience -> Slow Burn (salta uma linha) */
+.sw-talent-column[data-group="Composure"]
+.sw-talent-node:nth-of-type(3)::after {
+    height: 108px;
+}
+
+/* Lone Ranger -> Clutch (salta uma linha) */
+.sw-talent-column[data-group="Composure"]
+.sw-talent-node:nth-of-type(5)::after {
+    height: 108px;
+}
+
+/* ========================================
+   SYNERGY - POSICOES E LIGACAO
+   Apenas esta categoria e alterada.
+======================================== */
+
+.sw-talent-column[data-group="Synergy"] .sw-talent-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, 55px);
+    column-gap: 14px;
+    row-gap: 26px;
+    justify-items: center;
+    align-items: center;
+    position: relative;
+}
+
+.sw-talent-column[data-group="Synergy"] .sw-talent-node:nth-of-type(1) {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.sw-talent-column[data-group="Synergy"] .sw-talent-node:nth-of-type(2) {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.sw-talent-column[data-group="Synergy"] .sw-talent-node:nth-of-type(3) {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+.sw-talent-column[data-group="Synergy"] .sw-talent-node:nth-of-type(4) {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+.sw-talent-column[data-group="Synergy"] .sw-talent-node:nth-of-type(5) {
+    grid-column: 1;
+    grid-row: 4;
+}
+
+/* Focus Fire -> Team Rhythm: uma unica linha vertical */
+.sw-talent-column[data-group="Synergy"] .sw-talent-node:nth-of-type(1)::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 109px;
+    background: #a989d3;
+    pointer-events: none;
+    
+}
+
+/* AGGRESSION, COMPOSURE E SYNERGY */
+/* Aumentar todos os SVG para 140% */
+
+.sw-talent-column[data-group="Aggression"] .sw-talent-icon svg,
+.sw-talent-column[data-group="Composure"] .sw-talent-icon svg,
+.sw-talent-column[data-group="Synergy"] .sw-talent-icon svg {
+    transform: scale(0.8) !important;
+}
+
+
+/* TOOLTIP FLUTUANTE DOS TALENTOS */
+.sw-talent-tooltip[hidden] {
+     display:none !important;
+     
+}
+.sw-talent-tooltip {
+  position:fixed;
+     z-index:40000;
+     pointer-events:none;
+  box-sizing:border-box;
+     width:190px;
+     max-width:calc(100vw - 24px);
+  padding:9px 8px;
+     border:1px solid #667b70;
+     border-radius:6px;
+  background:#252528;
+     color:#f5f5f5;
+  font:13px/1.4 Poppins,Arial,sans-serif;
+  box-shadow:0 5px 16px rgba(0,0,0,.32);
+  transform: none !important;
+  pointer-events: none;
+}
+.sw-tooltip-head {
+     display:flex;
+     align-items:baseline;
+     justify-content:space-between;
+     gap:8px;
+     margin-bottom:6px;
+     
+}
+.sw-tooltip-head strong {
+     font-size:13px;
+     font-weight:700;
+     color:white;
+     
+}
+.sw-tooltip-head span {
+     font-size:10px;
+     color:#d0d6d3;
+     white-space:nowrap;
+     
+}
+.sw-tooltip-require {
+     color:#ff4d55;
+     font-size:11px;
+     margin:2px 0;
+     
+}
+.sw-tooltip-description {
+     color:#8eac9e;
+     font-size:13px;
+     line-height:1.42;
+     margin-top:6px;
+     
+}
+.sw-tooltip-description b {
+     color:#fff;
+     font-weight:700;
+     
+}
+
+/* Weaponscraft: disposicao EXATA da referencia enviada */
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-grid {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(5,55px);
+  column-gap:14px;
+  row-gap:26px;
+  justify-items:center;
+  align-items:center;
+  position:relative;
+  isolation:isolate;
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-of-type(1) {
+    grid-column:1;
+    grid-row:1
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-of-type(2) {
+    grid-column:2;
+    grid-row:1
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-of-type(3) {
+    grid-column:1;
+    grid-row:2
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-of-type(4) {
+    grid-column:2;
+    grid-row:2
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-of-type(5) {
+    grid-column:1;
+    grid-row:3
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-of-type(6) {
+    grid-column:2;
+    grid-row:4
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-of-type(7) {
+    grid-column:1;
+    grid-row:5
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node:nth-of-type(8) {
+    grid-column:2;
+    grid-row:5
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node {
+    z-index:1
+}
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-rank {
+    z-index:2
+}
+
+.sw-weapons-links .sw-weapon-box {
+    transform: translateY(-10px);
+}
+
+/* Subir Opening Duel */
+.sw-talent-column[data-group="Aggression"]
+.sw-talent-node:nth-of-type(8) {
+    transform: translateY(-12px);
+}
+/* INNATE TALENTS: five independent, optional, unique slots */
+.sw-talent-head .sw-innate-label{
+    font-size:17px;
+    font-weight:700;
+    color:#eee;
+    margin-left:8px
+}
+.sw-innate-slots{
+    display:flex;
+    gap:6px;
+    align-items:center
+}
+.sw-talent-head .sw-innate-slot {
+    width: 40px;
+    height: 40px;
+    padding: 3px;
+    flex: none;
+
+    border: 1px solid #91410c;
+    border-radius: 13px;
+
+    background: #1a1918;
+    color: #944713;
+
+    font: bold 20px/1 Arial, sans-serif;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+.sw-talent-head .sw-innate-slot[data-group=Weaponscraft],.sw-innate-picker-group[data-group=Weaponscraft]{
+    --innate-accent:#ffd14b;
+    --innate-bg:#302717
+}
+.sw-talent-head .sw-innate-slot[data-group=Aggression],.sw-innate-picker-group[data-group=Aggression]{
+    --innate-accent:#ff999e;
+    --innate-bg:#352126
+}
+.sw-talent-head .sw-innate-slot[data-group=Composure],.sw-innate-picker-group[data-group=Composure]{
+    --innate-accent:#50e1ef;
+    --innate-bg:#19363b
+}
+.sw-talent-head .sw-innate-slot[data-group=Synergy],.sw-innate-picker-group[data-group=Synergy]{
+    --innate-accent:#c6adff;
+    --innate-bg:#30253f
+}
+.sw-talent-head .sw-innate-slot[data-group] {
+    background: var(--innate-accent);
+    color: #161616;
+    border-color: var(--innate-accent);
+    box-shadow: 0 0 13px color-mix(
+        in srgb,
+        var(--innate-accent) 45%,
+        transparent
+    );
+}
+.sw-innate-icon{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1
+}
+.sw-talent-head .sw-innate-slot .sw-innate-icon svg {
+    width: 25px !important;
+    height: 25px !important;
+    max-width: 25px !important;
+    max-height: 25px !important;
+}
+
+.sw-talent-node.sw-innate .sw-talent-rank{
+    color:#57f18a;
+    border:1px solid #33995a
+}
+.sw-talent-node.sw-innate:not(.sw-active){
+    box-shadow:inset 0 0 0 1px #33995a
+}
+
+/* Escurecimento suave ao abrir Innate Slot */
+.sw-talent-modal:has(.sw-innate-picker:not([hidden]))::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.70);
+    border-radius: 14px;
+    z-index: 300;
+    pointer-events: auto;
+}
+
+/* Seletor Innate sempre por cima */
+.sw-talent-modal:has(.sw-innate-picker:not([hidden]))
+.sw-innate-picker {
+    z-index: 301;
+}
+
+.sw-innate-picker[hidden]{
+    display:none!important
+}
+.sw-innate-picker{
+    position:absolute;
+    z-index:31000;
+    top:68px;
+    left:50%;
+    transform:translateX(-50%);
+    width: max-content;
+    max-width: calc(100% - 24px);
+    max-height:75vh;
+    overflow:auto;
+    padding:14px;
+    background:#18181c;
+    border:1px solid #62626b;
+    border-radius:10px;
+    box-shadow:0 16px 40px #000b
+}
+.sw-talent-modal{
+    position:relative
+}
+.sw-innate-picker-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px
+}
+.sw-innate-picker-head strong{
+    font-size:16px;
+    color:#eee
+}
+.sw-innate-picker-head button{
+    background:#303035;
+    border:1px solid #666;
+    color:#eee;
+    padding:6px 10px;
+    margin-left:8px;
+    border-radius:5px;
+    cursor:pointer
+}
+.sw-innate-picker-head button:disabled{
+    opacity:.4;
+    cursor:not-allowed
+}
+.sw-innate-picker-groups {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 12px;
+    justify-content: center;
+    align-items: start;
+}
+.sw-innate-picker-group {
+    width: max-content;
+    background: var(--innate-bg);
+    border: 1px solid var(--innate-accent);
+    border-radius: 9px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.sw-innate-picker-group h4{
+    color:var(--innate-accent);
+    margin:0 0 9px;
+    font-size:14px
+}
+.sw-innate-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 55px);
+    gap: 7px;
+}
+.sw-innate-choice {
+    width: 55px;
+    height: 55px;
+    min-width: 0;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: color-mix(in srgb, var(--innate-accent) 20%, #141414);
+    border: 1px solid color-mix(in srgb, var(--innate-accent) 40%, #141414);
+    border-radius: 8px;
+
+    color: var(--innate-accent);
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.sw-innate-choice:hover:not(:disabled),.sw-innate-choice.sw-selected{
+    background:var(--innate-accent);
+    color:#161616
+}
+.sw-innate-choice:disabled{
+    opacity:.25;
+    cursor:not-allowed
+}
+@media(max-width:700px){
+    .sw-talent-head{
+        flex-wrap:wrap
+    }
+    .sw-innate-picker-groups{
+        grid-template-columns:1fr
+    }
+    .sw-talent-head .sw-innate-slot{
+        width:40px;
+        height:40px;
+        font-size:34px
+    }
+    
+}
+
+.sw-innate-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 55px);
+    gap: 7px;
+}
+
+/* SVGs originais sem preenchimento forçado */
+.sw-innate-icon svg {
+    fill: none;
+}
+
+/* Diminuir apenas os ícones do seletor INNATES */
+.sw-innate-picker .sw-innate-choice .sw-innate-icon svg {
+    width: 25px !important;
+    height: 25px !important;
+    max-width: 25px !important;
+    max-height: 25px !important;
+}
+
+/* =========================================
+   PLAYER ROLE
+========================================= */
+
+.sw-player-role {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 12px auto;
+}
+
+/* TITLE */
+
+.sw-role-title {
+    color: #aaa;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* BUTTON CONTAINER */
+
+.sw-role-options {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* BUTTONS */
+
+.sw-role-btn {
+    --role-color: #ffd14b;
+
+    width: 46px;
+    height: 46px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #201e22;
+    color: var(--role-color);
+    border: 1px solid var(--role-color);
+    border-radius: 12px;
+
+    font-size: 24px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+/* ENTRY FRAGGER */
+
+.sw-role-btn[data-role="entry"] {
+    --role-color: #ff999e;
+}
+
+/* TEAM PLAYER */
+
+.sw-role-btn[data-role="team"] {
+    --role-color: #c6adff;
+}
+
+/* CLUTCH PLAYER */
+
+.sw-role-btn[data-role="clutch"] {
+    --role-color: #50e1ef;
+}
+
+/* BALANCED */
+
+.sw-role-btn[data-role="balanced"] {
+    --role-color: #ffd14b;
+}
+
+/* HOVER */
+
+.sw-role-btn:hover {
+    filter: brightness(1.25);
+}
+
+/* SELECTED ROLE */
+
+.sw-role-btn.sw-role-selected {
+    background: var(--role-color);
+    color: #161616;
+
+    box-shadow: 0 0 12px color-mix(
+        in srgb,
+        var(--role-color) 40%,
+        transparent
+    );
+}
+
+/* =========================================
+   PLAYER ROLE NAME
+========================================= */
+
+.sw-role-name {
+    margin-top: 4px;
+    min-height: 18px;
+    text-align: center;
+    color: #ffd14b;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: color 0.15s;
+}
+
+/* =========================================
+   PLAYER ROLE DESCRIPTION
+========================================= */
+
+.sw-role-name {
+    margin-top: 1px;
+    min-height: 22px;
+    text-align: center;
+    color: #ffd14b;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    transition: color 0.15s;
+}
+
+.sw-role-description {
+    max-width: 400px;
+    margin-top: -9px;
+    color: #999;
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* BEST TALENTS */
+.sw-best-talents-row { display:flex;flex-direction:column;align-items:center;gap:6px;margin:12px auto; }
+#sw-best-talents { background:#302713;color:#ffd14b;border:1px solid #a88737;border-radius:9px;padding:10px 24px;font-weight:800;letter-spacing:.7px;cursor:pointer; }
+#sw-best-talents:hover { filter:brightness(1.2); }
+#sw-best-talents-status {color:#999;font-size:11px;text-align:center;min-height:15px;}
+
+/* =========================================
+   TALENT POPUP - COMPACT LAYOUT
+========================================= */
+
+.sw-talent-modal {
+    width: min(1050px, 98vw);
+    max-height: 98vh;
+    overflow: hidden;
+    padding: 14px 16px;
+}
+
+/* Reduzir espaços verticais */
+.sw-talent-head {
+    margin-bottom: 10px;
+}
+
+.sw-talent-columns {
+    gap: 14px;
+}
+
+/* Zona inferior: três áreas lado a lado */
+.sw-talent-modal:has(.sw-player-role) {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+/* Player Role à esquerda */
+.sw-player-role {
+    align-items: flex-start;
+    margin: 20px 0 0;
+    gap: 0px;
+}
+
+.sw-role-options {
+    justify-content: flex-start;
+}
+
+
+
+
+/* Generate Best Talents ao centro */
+.sw-best-talents-row {
+    margin: -0;
+    align-items: center;
+}
+
+/* Ecrãs mais pequenos */
+@media (max-height: 760px) {
+    .sw-talent-modal {
+        overflow-y: auto;
+    }
+}
+
+/* =====================================
+   POPUP MAIS COMPACTO
+===================================== */
+
+/* Reduzir espaço ocupado pelo Player Role */
+.sw-player-role {
+    margin-top: 8px !important;
+    margin-bottom: 0 !important;
+}
+
+/* Subir Generate Best Talents */
+.sw-best-talents-row {
+    margin-bottom: 0 !important;
+}
+
+/* Popup sem scroll em ecrãs grandes */
+@media (min-height: 750px) and (min-width: 900px) {
+    .sw-talent-modal {
+        overflow-y: hidden !important;
+    }
+}
+
+/* RODAPÉ DO POPUP: 3 COLUNAS */
+
+.sw-talent-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+/* PLAYER ROLE À ESQUERDA */
+
+
+/* CORRIGIR POSIÇÃO DO PLAYER ROLE */
+
+.sw-talent-footer .sw-player-role {
+    grid-column: 1;
+    justify-self: start;
+}
+
+.sw-talent-footer .sw-role-options {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.sw-talent-footer .sw-role-name {
+    margin: 12px 0 0 !important;
+    text-align: left;
+    width: 100%;
+}
+
+.sw-talent-footer .sw-role-description {
+    margin: 0 !important;
+    max-width: 320px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+/* GENERATE AO CENTRO */
+
+.sw-talent-footer .sw-best-talents-row {
+    grid-column: 2;
+    justify-self: center;
+}
+
+/* AGRADECIMENTOS À DIREITA */
+
+.sw-talent-footer .sw-talent-help {
+    grid-column: 3;
+    justify-self: end;
+    align-self: end;
+    text-align: right;
+    margin: 0;
+}
+
+/* POPUP COMPACTO */
+
+.sw-talent-modal {
+    max-height: 98vh;
+    overflow-y: auto;
+}
+
+/* EVITAR CORTES EM ECRÃS PEQUENOS */
+
+@media (max-width: 800px) {
+    .sw-talent-footer {
+        grid-template-columns: 1fr;
+    }
+
+    .sw-talent-footer .sw-best-talents-row,
+    .sw-talent-footer .sw-talent-help {
+        justify-self: center;
+        text-align: center;
+    }
+}
+
+.sw-talent-grid {
+    position: relative;
+}
+
+.sw-weapons-links,
+.sw-aggression-links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+}
+
+/* SVG das ligações acompanha a grelha */
+
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-grid,
+.sw-talent-column[data-group="Aggression"] .sw-talent-grid {
+    position: relative;
+    isolation: isolate;
+}
+
+.sw-weapons-links,
+.sw-aggression-links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 0;
+}
+
+.sw-talent-column[data-group="Weaponscraft"] .sw-talent-node,
+.sw-talent-column[data-group="Aggression"] .sw-talent-node {
+    position: relative;
+    z-index: 1;
+}
+
+body > .sw-talent-tooltip {
+  position: fixed !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+.sw-role-btn svg {
+    width: 25px;
+    height: 25px;
+    display: block;
+    pointer-events: none;
+}
+
+
+/* PLAYER ROLE: ÍCONES, NOME E DESCRIÇÃO */
+
+.sw-talent-footer .sw-player-role {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 3px;
+    margin: 0 !important;
+}
+
+.sw-talent-footer .sw-role-options {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.sw-talent-footer .sw-role-name {
+    position: static;
+    margin: 0 !important;
+    width: auto;
+    min-height: 0;
+    text-align: left;
+    font-size: 16px;
+}
+
+.sw-talent-footer .sw-role-description {
+    position: static;
+    margin: 0 !important;
+    max-width: 260px;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+
+/* PLAYER ROLE COM TAMANHO FIXO */
+
+.sw-talent-footer .sw-player-role {
+    width: 270px;
+    height: 140px;
+    min-width: 270px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    justify-content: flex-start;
+}
+
+/* NOME DO ROLE */
+.sw-talent-footer .sw-role-name {
+    height: 24px;
+    min-height: 24px;
+    margin: 4px 0 0 !important;
+}
+
+/* DESCRIÇÃO */
+.sw-talent-footer .sw-role-description {
+    width: 100%;
+    min-height: 100px;
+    max-height: 42px;
+    margin: 0 !important;
+    line-height: 1.4;
+    overflow-y: auto;
+}
+
+
+/* INNATE PICKER - WEAPONSCRAFT */
+/* SMG, ASSAULT RIFLES E SNIPER */
+
+
+/* INNATE WEAPONSCRAFT - INVERTER SMG */
+
+.sw-innate-picker-group[data-group="Weaponscraft"]
+.sw-innate-choice:nth-child(1) svg {
+    transform: scaleX(-1) scale(1.5) !important;
+    transform-origin: center;
+}
+
+.sw-innate-picker-group[data-group="Weaponscraft"]
+.sw-innate-choice:nth-child(3) svg {
+    transform: scale(2.5) !important;
+    transform: translateX(5px) scale(2.2) !important;
+    transform-origin: center;
+}
+
+
+.sw-innate-picker-group[data-group="Weaponscraft"]
+.sw-innate-choice:nth-child(4) svg {
+    transform: scale(2) !important;
+    transform-origin: center;
+}
+
+/* SMG */
+.sw-innate-slot[title^="SMG Mastery"] svg {
+    transform: scaleX(-1) scale(1.3) !important;
+    transform-origin: center;
+}
+
+/* ASSAULT RIFLES / AK */
+.sw-innate-slot[title^="Assault Rifles Mastery"] svg {
+    transform: translateX(4px) scale(1.7) !important;
+}
+
+/* SNIPER */
+.sw-innate-slot[title^="Sniper Mastery"] svg {
+    transform: scale(1.5) !important;
+    transform-origin: center;
+}
